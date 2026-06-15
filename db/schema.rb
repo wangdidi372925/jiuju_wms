@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_14_003000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_15_001000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -125,6 +125,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_003000) do
     t.datetime "updated_at", null: false
     t.index ["drug_master_id"], name: "index_pharma_drug_variant_links_on_drug_master_id"
     t.index ["spree_variant_id"], name: "index_pharma_drug_variant_links_on_spree_variant_id", unique: true
+  end
+
+  create_table "pharma_inventory_imports", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "error_details", default: [], null: false
+    t.integer "failed_rows", default: 0, null: false
+    t.string "original_filename", null: false
+    t.string "status", default: "pending", null: false
+    t.integer "success_rows", default: 0, null: false
+    t.integer "total_rows", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_pharma_inventory_imports_on_created_at"
+    t.index ["status"], name: "index_pharma_inventory_imports_on_status"
   end
 
   create_table "pharma_order_allocations", force: :cascade do |t|
