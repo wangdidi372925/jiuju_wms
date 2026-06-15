@@ -76,7 +76,7 @@ If this is verbose, install the [`@spree/cli`](https://www.npmjs.com/package/@sp
 
 ### Environment variables
 
-`docker-compose.dev.yml` sets sensible dev defaults for `DATABASE_URL`, `REDIS_URL`, and `MEILISEARCH_URL`, while `RAILS_ENV` is baked into the Dockerfile `dev` stage. Most of `.env.example` is production-shaped and ignored in dev. The only variable you must set is:
+`docker-compose.dev.yml` sets sensible dev defaults for the database connection, `REDIS_URL`, and `MEILISEARCH_URL`, while `RAILS_ENV` is baked into the Dockerfile `dev` stage. Most of `.env.example` is production-shaped and ignored in dev. The only variable you must set is:
 
 | Variable | Required | Notes |
 |---|---|---|
@@ -90,6 +90,24 @@ For production deployments (S3, SMTP, Sentry, etc.) see [the environment variabl
 ## Customization
 
 This is a standard Spree application. Customize it however you need — see the [Spree Customization Guide](https://docs.spreecommerce.org/developer/customization).
+
+## Jiuju WMS Pharma B2B Development
+
+This project uses Spree as the commerce backend and keeps regulated pharmacy B2B logic under the `Pharma` namespace.
+
+Common local commands:
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml exec web bin/rails db:prepare db:seed
+docker compose -f docker-compose.dev.yml exec web bundle exec rspec spec/models/pharma spec/services/pharma
+```
+
+Supplier visibility modes are stored in `Pharma::SupplierVisibilityConfig`:
+
+- `hidden`: pharmacy buyers see platform labels only.
+- `partial`: pharmacy buyers see regional warehouse labels.
+- `visible`: pharmacy buyers see the actual supplier name.
 
 ## Native Ruby (advanced)
 

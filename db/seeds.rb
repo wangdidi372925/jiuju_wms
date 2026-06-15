@@ -26,3 +26,5 @@ if defined?(Spree::AdminUser) && !Rails.env.production?
 
   puts "Spree admin credentials: #{admin_email} / #{admin_password}"
 end
+
+load Rails.root.join('db/seeds/pharma_demo.rb')
