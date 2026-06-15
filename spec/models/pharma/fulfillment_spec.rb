@@ -206,4 +206,20 @@ RSpec.describe 'Pharma fulfillment models', type: :model do
     expect(fulfillment).not_to be_valid
     expect(fulfillment.errors[:supplier_warehouse]).to include('must belong to supplier')
   end
+
+  it 'requires fulfillment order to exist' do
+    supplier = supplier()
+    warehouse = warehouse_for(supplier)
+
+    fulfillment = Pharma::SupplierFulfillment.new(
+      spree_order_id: -1,
+      supplier: supplier,
+      supplier_warehouse: warehouse,
+      fulfillment_no: 'FUL-002',
+      status: 'pending'
+    )
+
+    expect(fulfillment).not_to be_valid
+    expect(fulfillment.errors[:spree_order]).to include('must exist')
+  end
 end

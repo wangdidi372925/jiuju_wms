@@ -12,6 +12,7 @@ module Pharma
     validates :fulfillment_no, uniqueness: true
     validates :status, inclusion: { in: STATUSES }
     validate :warehouse_belongs_to_supplier
+    validate :spree_order_exists
 
     def shipped?
       shipped_at.present?
@@ -27,6 +28,12 @@ module Pharma
       return if supplier.blank? || supplier_warehouse.blank?
 
       errors.add(:supplier_warehouse, 'must belong to supplier') if supplier_warehouse.supplier_id != supplier.id
+    end
+
+    def spree_order_exists
+      return if spree_order_id.blank?
+
+      errors.add(:spree_order, 'must exist') if spree_order.blank?
     end
   end
 end
