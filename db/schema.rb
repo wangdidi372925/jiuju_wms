@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_10_130734) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_14_001000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -76,6 +76,93 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_130734) do
     t.index ["slug", "sluggable_type", "scope", "locale"], name: "index_friendly_id_slugs_unique", unique: true
     t.index ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
     t.index ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
+  end
+
+  create_table "pharma_pharmacies", force: :cascade do |t|
+    t.string "address", null: false
+    t.string "city", null: false
+    t.string "code", null: false
+    t.string "contact_name", null: false
+    t.string "contact_phone", null: false
+    t.datetime "created_at", null: false
+    t.string "district"
+    t.string "name", null: false
+    t.string "province", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_pharma_pharmacies_on_code", unique: true
+    t.index ["status"], name: "index_pharma_pharmacies_on_status"
+  end
+
+  create_table "pharma_pharmacy_licenses", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "expires_on", null: false
+    t.string "license_no", null: false
+    t.string "license_type", null: false
+    t.bigint "pharmacy_id", null: false
+    t.date "starts_on", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_on"], name: "index_pharma_pharmacy_licenses_on_expires_on"
+    t.index ["pharmacy_id", "license_type", "license_no"], name: "idx_pharma_pharmacy_licenses_unique_license", unique: true
+    t.index ["pharmacy_id"], name: "index_pharma_pharmacy_licenses_on_pharmacy_id"
+    t.index ["status"], name: "index_pharma_pharmacy_licenses_on_status"
+  end
+
+  create_table "pharma_supplier_licenses", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "expires_on", null: false
+    t.string "license_no", null: false
+    t.string "license_type", null: false
+    t.date "starts_on", null: false
+    t.string "status", default: "pending", null: false
+    t.bigint "supplier_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_on"], name: "index_pharma_supplier_licenses_on_expires_on"
+    t.index ["status"], name: "index_pharma_supplier_licenses_on_status"
+    t.index ["supplier_id", "license_type", "license_no"], name: "idx_pharma_supplier_licenses_unique_license", unique: true
+    t.index ["supplier_id"], name: "index_pharma_supplier_licenses_on_supplier_id"
+  end
+
+  create_table "pharma_supplier_visibility_configs", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "mode", default: "hidden", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "idx_one_active_supplier_visibility_config", unique: true, where: "(active = true)"
+  end
+
+  create_table "pharma_supplier_warehouses", force: :cascade do |t|
+    t.string "address", null: false
+    t.string "city", null: false
+    t.string "code", null: false
+    t.boolean "cold_chain_enabled", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "district"
+    t.string "name", null: false
+    t.string "province", null: false
+    t.string "status", default: "active", null: false
+    t.bigint "supplier_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_pharma_supplier_warehouses_on_code", unique: true
+    t.index ["status"], name: "index_pharma_supplier_warehouses_on_status"
+    t.index ["supplier_id"], name: "index_pharma_supplier_warehouses_on_supplier_id"
+  end
+
+  create_table "pharma_suppliers", force: :cascade do |t|
+    t.string "city", null: false
+    t.string "code", null: false
+    t.string "contact_name", null: false
+    t.string "contact_phone", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "priority", default: 0, null: false
+    t.string "province", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_pharma_suppliers_on_code", unique: true
+    t.index ["priority"], name: "index_pharma_suppliers_on_priority"
+    t.index ["status"], name: "index_pharma_suppliers_on_status"
   end
 
   create_table "spree_addresses", force: :cascade do |t|
@@ -2245,6 +2332,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_130734) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "pharma_pharmacy_licenses", "pharma_pharmacies", column: "pharmacy_id"
+  add_foreign_key "pharma_supplier_licenses", "pharma_suppliers", column: "supplier_id"
+  add_foreign_key "pharma_supplier_warehouses", "pharma_suppliers", column: "supplier_id"
   add_foreign_key "spree_option_type_translations", "spree_option_types"
   add_foreign_key "spree_option_value_translations", "spree_option_values"
   add_foreign_key "spree_payment_sources", "spree_payment_methods", column: "payment_method_id"
