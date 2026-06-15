@@ -17,6 +17,14 @@ Rails.application.routes.draw do
   end
 
   namespace :pharma do
+    namespace :admin do
+      namespace :api do
+        namespace :v1 do
+          resource :supplier_visibility_config, only: %i[show update]
+        end
+      end
+    end
+
     namespace :api do
       namespace :v1 do
         resources :drugs, only: :index do
