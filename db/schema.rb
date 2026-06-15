@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_14_001000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_14_002000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -78,6 +78,55 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_001000) do
     t.index ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
   end
 
+  create_table "pharma_drug_batch_stocks", force: :cascade do |t|
+    t.string "batch_no", null: false
+    t.datetime "created_at", null: false
+    t.bigint "drug_master_id", null: false
+    t.date "expiry_date", null: false
+    t.integer "quantity_locked", default: 0, null: false
+    t.integer "quantity_on_hand", default: 0, null: false
+    t.string "status", default: "active", null: false
+    t.bigint "supplier_id", null: false
+    t.bigint "supplier_offer_id", null: false
+    t.bigint "supplier_warehouse_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["drug_master_id"], name: "index_pharma_drug_batch_stocks_on_drug_master_id"
+    t.index ["expiry_date"], name: "index_pharma_drug_batch_stocks_on_expiry_date"
+    t.index ["status"], name: "index_pharma_drug_batch_stocks_on_status"
+    t.index ["supplier_id", "supplier_warehouse_id", "drug_master_id", "batch_no"], name: "idx_pharma_batch_stock_unique_batch", unique: true
+    t.index ["supplier_id"], name: "index_pharma_drug_batch_stocks_on_supplier_id"
+    t.index ["supplier_offer_id"], name: "index_pharma_drug_batch_stocks_on_supplier_offer_id"
+    t.index ["supplier_warehouse_id"], name: "index_pharma_drug_batch_stocks_on_supplier_warehouse_id"
+  end
+
+  create_table "pharma_drug_masters", force: :cascade do |t|
+    t.string "approval_number", null: false
+    t.string "common_name", null: false
+    t.datetime "created_at", null: false
+    t.string "dosage_form", null: false
+    t.string "manufacturer", null: false
+    t.string "package_unit", null: false
+    t.boolean "prescription_required", default: false, null: false
+    t.string "specification", null: false
+    t.string "status", default: "active", null: false
+    t.string "storage_condition", null: false
+    t.string "temperature_control", default: "normal", null: false
+    t.string "trade_name"
+    t.datetime "updated_at", null: false
+    t.index ["approval_number"], name: "index_pharma_drug_masters_on_approval_number"
+    t.index ["common_name", "specification", "manufacturer"], name: "idx_pharma_drug_master_identity"
+    t.index ["status"], name: "index_pharma_drug_masters_on_status"
+  end
+
+  create_table "pharma_drug_variant_links", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "drug_master_id", null: false
+    t.bigint "spree_variant_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["drug_master_id"], name: "index_pharma_drug_variant_links_on_drug_master_id"
+    t.index ["spree_variant_id"], name: "index_pharma_drug_variant_links_on_spree_variant_id", unique: true
+  end
+
   create_table "pharma_pharmacies", force: :cascade do |t|
     t.string "address", null: false
     t.string "city", null: false
@@ -122,6 +171,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_001000) do
     t.index ["status"], name: "index_pharma_supplier_licenses_on_status"
     t.index ["supplier_id", "license_type", "license_no"], name: "idx_pharma_supplier_licenses_unique_license", unique: true
     t.index ["supplier_id"], name: "index_pharma_supplier_licenses_on_supplier_id"
+  end
+
+  create_table "pharma_supplier_offer_regions", force: :cascade do |t|
+    t.string "city"
+    t.datetime "created_at", null: false
+    t.integer "delivery_days", default: 3, null: false
+    t.string "district"
+    t.string "province", null: false
+    t.string "status", default: "active", null: false
+    t.bigint "supplier_offer_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["status"], name: "index_pharma_supplier_offer_regions_on_status"
+    t.index ["supplier_offer_id", "province", "city", "district"], name: "idx_pharma_offer_regions_lookup"
+    t.index ["supplier_offer_id"], name: "index_pharma_supplier_offer_regions_on_supplier_offer_id"
+  end
+
+  create_table "pharma_supplier_offers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "drug_master_id", null: false
+    t.datetime "ends_at", null: false
+    t.integer "max_order_quantity"
+    t.integer "min_order_quantity", default: 1, null: false
+    t.datetime "starts_at", null: false
+    t.string "status", default: "draft", null: false
+    t.bigint "supplier_id", null: false
+    t.bigint "supplier_warehouse_id", null: false
+    t.decimal "unit_price", precision: 12, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.index ["drug_master_id"], name: "index_pharma_supplier_offers_on_drug_master_id"
+    t.index ["status"], name: "index_pharma_supplier_offers_on_status"
+    t.index ["supplier_id", "drug_master_id", "supplier_warehouse_id"], name: "idx_pharma_supplier_offers_source"
+    t.index ["supplier_id"], name: "index_pharma_supplier_offers_on_supplier_id"
+    t.index ["supplier_warehouse_id"], name: "index_pharma_supplier_offers_on_supplier_warehouse_id"
+    t.index ["unit_price"], name: "index_pharma_supplier_offers_on_unit_price"
   end
 
   create_table "pharma_supplier_visibility_configs", force: :cascade do |t|
@@ -2332,8 +2415,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_001000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "pharma_drug_batch_stocks", "pharma_drug_masters", column: "drug_master_id"
+  add_foreign_key "pharma_drug_batch_stocks", "pharma_supplier_offers", column: "supplier_offer_id"
+  add_foreign_key "pharma_drug_batch_stocks", "pharma_supplier_warehouses", column: "supplier_warehouse_id"
+  add_foreign_key "pharma_drug_batch_stocks", "pharma_suppliers", column: "supplier_id"
+  add_foreign_key "pharma_drug_variant_links", "pharma_drug_masters", column: "drug_master_id"
   add_foreign_key "pharma_pharmacy_licenses", "pharma_pharmacies", column: "pharmacy_id"
   add_foreign_key "pharma_supplier_licenses", "pharma_suppliers", column: "supplier_id"
+  add_foreign_key "pharma_supplier_offer_regions", "pharma_supplier_offers", column: "supplier_offer_id"
+  add_foreign_key "pharma_supplier_offers", "pharma_drug_masters", column: "drug_master_id"
+  add_foreign_key "pharma_supplier_offers", "pharma_supplier_warehouses", column: "supplier_warehouse_id"
+  add_foreign_key "pharma_supplier_offers", "pharma_suppliers", column: "supplier_id"
   add_foreign_key "pharma_supplier_warehouses", "pharma_suppliers", column: "supplier_id"
   add_foreign_key "spree_option_type_translations", "spree_option_types"
   add_foreign_key "spree_option_value_translations", "spree_option_values"
