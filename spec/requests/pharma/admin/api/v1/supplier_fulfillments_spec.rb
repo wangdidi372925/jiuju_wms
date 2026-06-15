@@ -2,13 +2,21 @@
 
 require 'rails_helper'
 
-RSpec.describe Pharma::SupplierFulfillmentWorkflow do
-  def supplier
+RSpec.describe 'Pharma admin supplier fulfillments API', type: :request do
+  def json_body
+    JSON.parse(response.body)
+  end
+
+  def admin_headers
+    { 'X-Pharma-Admin-Token' => 'dev-admin-token' }
+  end
+
+  def supplier(code: 'SUP-FLOW-API-001')
     Pharma::Supplier.create!(
       name: '华东医药供货有限公司',
-      code: 'SUP-FLOW-001',
+      code: code,
       contact_name: '李经理',
-      contact_phone: '13900010001',
+      contact_phone: '13900011001',
       province: '上海市',
       city: '上海市',
       status: 'approved'
@@ -19,10 +27,10 @@ RSpec.describe Pharma::SupplierFulfillmentWorkflow do
     Pharma::SupplierWarehouse.create!(
       supplier: supplier,
       name: '上海中心仓',
-      code: 'WH-FLOW-001',
+      code: 'WH-FLOW-API-001',
       province: '上海市',
       city: '上海市',
-      address: '仓库路 10 号',
+      address: '仓库路 11 号',
       status: 'active'
     )
   end
@@ -33,7 +41,7 @@ RSpec.describe Pharma::SupplierFulfillmentWorkflow do
       specification: '0.25g*24粒',
       dosage_form: '胶囊剂',
       manufacturer: '示例制药有限公司',
-      approval_number: '国药准字HFLOW001',
+      approval_number: '国药准字HFLOWAPI001',
       package_unit: '盒',
       storage_condition: '常温',
       temperature_control: 'normal'
@@ -59,7 +67,7 @@ RSpec.describe Pharma::SupplierFulfillmentWorkflow do
       supplier_warehouse: warehouse,
       drug_master: drug,
       supplier_offer: offer,
-      batch_no: 'BATCH-FLOW-001',
+      batch_no: 'BATCH-FLOW-API-001',
       expiry_date: Date.current + 2.years,
       quantity_on_hand: 100,
       quantity_locked: 10,
@@ -71,8 +79,8 @@ RSpec.describe Pharma::SupplierFulfillmentWorkflow do
     store = Spree::Store.default
 
     Spree::Order.create!(
-      number: 'RFLOW001',
-      email: 'rflow001@example.com',
+      number: 'RFLOWAPI001',
+      email: 'rflowapi001@example.com',
       store: store,
       currency: store.default_currency,
       locale: store.default_locale,
@@ -123,71 +131,84 @@ RSpec.describe Pharma::SupplierFulfillmentWorkflow do
       spree_order_id: order.id,
       supplier: supplier,
       supplier_warehouse: warehouse,
-      fulfillment_no: 'FUL-RFLOW001-1-1',
+      fulfillment_no: 'FUL-RFLOWAPI001-1-1',
       status: fulfillment_status
     )
 
     { fulfillment: fulfillment, allocation: allocation, stock: stock }
   end
 
-  it 'moves a pending fulfillment into picking' do
-    setup = fulfillment_setup
+  it 'requires an admin API token' do
+    get '/pharma/admin/api/v1/supplier_fulfillments'
 
-    fulfillment = described_class.new.call(fulfillment: setup.fetch(:fulfillment), event: 'start_picking')
-
-    expect(fulfillment).to have_attributes(status: 'picking', shipped_at: nil, received_at: nil)
-    expect(setup.fetch(:allocation).reload.status).to eq('allocated')
+    expect(response).to have_http_status(:unauthorized)
+    expect(json_body).to include('error' => 'unauthorized')
   end
 
-  it 'ships a pending fulfillment and confirms related allocations' do
+  it 'lists fulfillments with an optional status filter' do
+    setup = fulfillment_setup(fulfillment_status: 'pending')
+
+    get '/pharma/admin/api/v1/supplier_fulfillments',
+        params: { status: 'pending' },
+        headers: admin_headers
+
+    expect(response).to have_http_status(:ok)
+    expect(json_body.fetch('data')).to contain_exactly(
+      hash_including(
+        'id' => setup.fetch(:fulfillment).id,
+        'status' => 'pending',
+        'supplier_name' => '华东医药供货有限公司',
+        'warehouse_name' => '上海中心仓'
+      )
+    )
+  end
+
+  it 'shows fulfillment details with related allocations' do
     setup = fulfillment_setup
 
-    fulfillment = described_class.new.call(
-      fulfillment: setup.fetch(:fulfillment),
-      event: 'ship',
-      delivery_company: '顺丰速运',
-      delivery_tracking_no: 'SF123456'
-    )
+    get "/pharma/admin/api/v1/supplier_fulfillments/#{setup.fetch(:fulfillment).id}", headers: admin_headers
 
-    expect(fulfillment).to have_attributes(
-      status: 'shipped',
-      delivery_company: '顺丰速运',
-      delivery_tracking_no: 'SF123456'
+    expect(response).to have_http_status(:ok)
+    expect(json_body.fetch('data')).to include(
+      'id' => setup.fetch(:fulfillment).id,
+      'status' => 'pending',
+      'allocations' => [
+        hash_including(
+          'id' => setup.fetch(:allocation).id,
+          'status' => 'allocated',
+          'batch_no' => 'BATCH-FLOW-API-001',
+          'allocated_quantity' => 10
+        )
+      ]
     )
-    expect(fulfillment.shipped_at).to be_present
+  end
+
+  it 'transitions a fulfillment through the workflow' do
+    setup = fulfillment_setup
+
+    patch "/pharma/admin/api/v1/supplier_fulfillments/#{setup.fetch(:fulfillment).id}/transition",
+          params: { event: 'ship', delivery_company: '顺丰速运', delivery_tracking_no: 'SF987654' },
+          headers: admin_headers
+
+    expect(response).to have_http_status(:ok)
+    expect(json_body.fetch('data')).to include(
+      'status' => 'shipped',
+      'delivery_company' => '顺丰速运',
+      'delivery_tracking_no' => 'SF987654'
+    )
+    expect(json_body.dig('data', 'shipped_at')).to be_present
     expect(setup.fetch(:allocation).reload.status).to eq('confirmed')
   end
 
-  it 'receives a shipped fulfillment and fulfills related allocations' do
-    setup = fulfillment_setup(allocation_status: 'confirmed', fulfillment_status: 'shipped')
-
-    fulfillment = described_class.new.call(fulfillment: setup.fetch(:fulfillment), event: 'receive')
-
-    expect(fulfillment).to have_attributes(status: 'received')
-    expect(fulfillment.received_at).to be_present
-    expect(setup.fetch(:allocation).reload.status).to eq('fulfilled')
-  end
-
-  it 'cancels an open fulfillment, cancels allocations, and releases locked stock' do
-    setup = fulfillment_setup
-
-    fulfillment = described_class.new.call(fulfillment: setup.fetch(:fulfillment), event: 'cancel')
-
-    expect(fulfillment.status).to eq('canceled')
-    expect(setup.fetch(:allocation).reload.status).to eq('canceled')
-    expect(setup.fetch(:stock).reload.quantity_locked).to eq(0)
-  end
-
-  it 'rejects invalid transitions without changing persisted data' do
+  it 'returns a workflow error for invalid transitions' do
     setup = fulfillment_setup(allocation_status: 'fulfilled', fulfillment_status: 'received')
 
-    expect do
-      described_class.new.call(fulfillment: setup.fetch(:fulfillment), event: 'ship')
-    end.to raise_error(Pharma::SupplierFulfillmentWorkflow::WorkflowError) { |error|
-      expect(error.code).to eq('invalid_transition')
-    }
+    patch "/pharma/admin/api/v1/supplier_fulfillments/#{setup.fetch(:fulfillment).id}/transition",
+          params: { event: 'ship' },
+          headers: admin_headers
 
+    expect(response).to have_http_status(422)
+    expect(json_body).to include('error' => 'invalid_transition')
     expect(setup.fetch(:fulfillment).reload.status).to eq('received')
-    expect(setup.fetch(:allocation).reload.status).to eq('fulfilled')
   end
 end

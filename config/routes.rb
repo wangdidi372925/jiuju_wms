@@ -31,6 +31,9 @@ Rails.application.routes.draw do
             resources :regions, only: :create, controller: :supplier_offer_regions
           end
           resources :supplier_offer_regions, only: :update
+          resources :supplier_fulfillments, only: %i[index show] do
+            patch :transition, on: :member
+          end
           resources :suppliers, only: %i[index show create update] do
             resources :licenses, only: :create, controller: :supplier_licenses
             resources :warehouses, only: :create, controller: :supplier_warehouses
