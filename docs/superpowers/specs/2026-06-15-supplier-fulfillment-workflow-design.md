@@ -44,7 +44,7 @@
 
 - `ship` 时把 `allocated` 的分配推进为 `confirmed`。
 - `receive` 时把关联分配推进为 `fulfilled`。
-- `cancel` 时把关联分配推进为 `canceled`。
+- `cancel` 时把关联分配推进为 `canceled`，并释放这些分配占用的锁定库存。
 
 ## Testing
 
