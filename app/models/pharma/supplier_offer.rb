@@ -27,6 +27,7 @@ module Pharma
     validates :status, :starts_at, :ends_at, presence: true
     validates :status, inclusion: { in: STATUSES }
     validate :ends_after_start
+    validate :warehouse_belongs_to_supplier
 
     def available_for?(province:, city:, quantity:, on: Time.current, min_expiry_date: 180.days.from_now.to_date)
       status == 'approved' &&
@@ -66,6 +67,12 @@ module Pharma
       return if starts_at.blank? || ends_at.blank?
 
       errors.add(:ends_at, 'must be after starts_at') if ends_at <= starts_at
+    end
+
+    def warehouse_belongs_to_supplier
+      return if supplier.blank? || supplier_warehouse.blank?
+
+      errors.add(:supplier_warehouse, 'must belong to supplier') if supplier_warehouse.supplier_id != supplier.id
     end
   end
 end

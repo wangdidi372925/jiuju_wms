@@ -54,6 +54,31 @@ RSpec.describe 'Pharma catalog models', type: :model do
     )
   end
 
+  def create_supplier(code:, name: "供应商#{code}")
+    Pharma::Supplier.create!(
+      name: name,
+      code: code,
+      contact_name: '李经理',
+      contact_phone: "139#{code.gsub(/\D/, '').last(8).rjust(8, '0')}",
+      province: '上海市',
+      city: '上海市',
+      status: 'approved',
+      priority: 1
+    )
+  end
+
+  def create_warehouse(supplier:, code:)
+    Pharma::SupplierWarehouse.create!(
+      supplier: supplier,
+      name: "仓库#{code}",
+      code: code,
+      province: '上海市',
+      city: '上海市',
+      address: "仓库#{code}地址",
+      status: 'active'
+    )
+  end
+
   it 'builds a readable drug display name' do
     expect(drug.display_name).to eq('阿莫西林胶囊 0.25g*24粒 示例制药有限公司')
   end
@@ -92,5 +117,55 @@ RSpec.describe 'Pharma catalog models', type: :model do
 
     expect(offer.available_for?(province: '上海市', city: '上海市', quantity: 30)).to be(true)
     expect(offer.available_quantity).to eq(80)
+  end
+
+  it 'requires an offer warehouse to belong to the offer supplier' do
+    other_supplier = create_supplier(code: 'SUP-CAT-OTHER')
+    other_warehouse = create_warehouse(supplier: other_supplier, code: 'WH-CAT-OTHER')
+
+    offer = Pharma::SupplierOffer.new(
+      supplier: supplier,
+      drug_master: drug,
+      supplier_warehouse: other_warehouse,
+      unit_price: 8.5,
+      min_order_quantity: 10,
+      status: 'approved',
+      starts_at: 1.day.ago,
+      ends_at: 30.days.from_now
+    )
+
+    expect(offer).not_to be_valid
+    expect(offer.errors[:supplier_warehouse]).to include('must belong to supplier')
+  end
+
+  it 'requires batch stock supplier, warehouse, and drug to match the offer' do
+    offer = Pharma::SupplierOffer.create!(
+      supplier: supplier,
+      drug_master: drug,
+      supplier_warehouse: warehouse,
+      unit_price: 8.5,
+      min_order_quantity: 10,
+      status: 'approved',
+      starts_at: 1.day.ago,
+      ends_at: 30.days.from_now
+    )
+    other_supplier = create_supplier(code: 'SUP-CAT-STOCK')
+    other_warehouse = create_warehouse(supplier: other_supplier, code: 'WH-CAT-STOCK')
+
+    stock = Pharma::DrugBatchStock.new(
+      supplier: other_supplier,
+      supplier_warehouse: other_warehouse,
+      drug_master: drug,
+      supplier_offer: offer,
+      batch_no: 'BATCH-MISMATCH',
+      expiry_date: Date.current + 2.years,
+      quantity_on_hand: 100,
+      quantity_locked: 0,
+      status: 'active'
+    )
+
+    expect(stock).not_to be_valid
+    expect(stock.errors[:supplier]).to include('must match supplier_offer')
+    expect(stock.errors[:supplier_warehouse]).to include('must match supplier_offer')
   end
 end
