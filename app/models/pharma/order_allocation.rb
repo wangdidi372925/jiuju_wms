@@ -20,9 +20,39 @@ module Pharma
     validates :allocated_unit_price, numericality: { greater_than_or_equal_to: 0 }
     validates :allocated_quantity, numericality: { only_integer: true, greater_than: 0 }
     validates :status, inclusion: { in: STATUSES }
+    validate :matches_drug_batch_stock
+    validate :spree_line_item_belongs_to_order
 
     def total_amount
       allocated_unit_price * allocated_quantity
+    end
+
+    private
+
+    def matches_drug_batch_stock
+      return if drug_batch_stock.blank?
+
+      errors.add(:supplier, 'must match drug_batch_stock') if supplier_id != drug_batch_stock.supplier_id
+      if supplier_warehouse_id != drug_batch_stock.supplier_warehouse_id
+        errors.add(:supplier_warehouse, 'must match drug_batch_stock')
+      end
+      errors.add(:supplier_offer, 'must match drug_batch_stock') if supplier_offer_id != drug_batch_stock.supplier_offer_id
+    end
+
+    def spree_line_item_belongs_to_order
+      return if spree_order_id.blank? || spree_line_item_id.blank?
+
+      if spree_order.blank?
+        errors.add(:spree_order, 'must exist')
+        return
+      end
+
+      if spree_line_item.blank?
+        errors.add(:spree_line_item, 'must exist')
+        return
+      end
+
+      errors.add(:spree_line_item, 'must belong to spree_order') if spree_line_item.order_id != spree_order_id
     end
   end
 end
