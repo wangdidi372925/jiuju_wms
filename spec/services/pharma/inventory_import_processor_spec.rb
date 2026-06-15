@@ -6,14 +6,16 @@ require 'support/pharma_xlsx_fixture'
 RSpec.describe Pharma::InventoryImportProcessor do
   include PharmaXlsxFixture
 
-  HEADERS = [
-    '供应商编码', '供应商名称', '供应商联系人', '供应商电话', '供应商省', '供应商市',
-    '仓库编码', '仓库名称', '仓库省', '仓库市', '仓库区', '仓库地址',
-    '通用名', '商品名', '规格', '剂型', '生产厂家', '批准文号', '包装单位',
-    '是否处方', '储存条件', '温控', '单价', '起订量', '限购量',
-    '报价状态', '报价开始', '报价结束', '可售省', '可售市', '可售区',
-    '配送天数', '批号', '效期', '库存', '锁定库存'
-  ].freeze
+  def inventory_headers
+    [
+      '供应商编码', '供应商名称', '供应商联系人', '供应商电话', '供应商省', '供应商市',
+      '仓库编码', '仓库名称', '仓库省', '仓库市', '仓库区', '仓库地址',
+      '通用名', '商品名', '规格', '剂型', '生产厂家', '批准文号', '包装单位',
+      '是否处方', '储存条件', '温控', '单价', '起订量', '限购量',
+      '报价状态', '报价开始', '报价结束', '可售省', '可售市', '可售区',
+      '配送天数', '批号', '效期', '库存', '锁定库存'
+    ]
+  end
 
   def valid_row(overrides = {})
     values = {
@@ -55,11 +57,11 @@ RSpec.describe Pharma::InventoryImportProcessor do
       '锁定库存' => '20'
     }.merge(overrides)
 
-    HEADERS.map { |header| values.fetch(header) }
+    inventory_headers.map { |header| values.fetch(header) }
   end
 
   def build_inventory_file(rows)
-    build_xlsx([HEADERS, *rows])
+    build_xlsx([inventory_headers, *rows])
   end
 
   it 'imports supplier offers, regions, and batch stock from a valid workbook row' do

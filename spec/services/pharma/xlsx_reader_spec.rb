@@ -27,8 +27,8 @@ RSpec.describe Pharma::XlsxReader do
     file.write('not a zip workbook')
     file.rewind
 
-    expect { described_class.new(file.path).rows }
-      .to raise_error(Pharma::XlsxReader::ParseError)
+    expect { described_class.new(file.path).rows }.
+      to raise_error(Pharma::XlsxReader::ParseError)
   ensure
     file&.close!
   end

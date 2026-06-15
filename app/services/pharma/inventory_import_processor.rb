@@ -142,7 +142,7 @@ module Pharma
       end
 
       import.update!(
-        status: import_status(total_rows: total_rows, failed_rows: error_details.size),
+        status: import_status(failed_rows: error_details.size),
         total_rows: total_rows,
         success_rows: success_rows,
         failed_rows: error_details.size,
@@ -201,9 +201,7 @@ module Pharma
 
     def upsert_warehouse(attributes, supplier)
       warehouse = Pharma::SupplierWarehouse.find_or_initialize_by(code: attributes.fetch(:warehouse_code))
-      if warehouse.persisted? && warehouse.supplier_id != supplier.id
-        raise RowError, "仓库编码#{warehouse.code}已属于其他供应商"
-      end
+      raise RowError, "仓库编码#{warehouse.code}已属于其他供应商" if warehouse.persisted? && warehouse.supplier_id != supplier.id
 
       warehouse.assign_attributes(
         supplier: supplier,
@@ -289,7 +287,7 @@ module Pharma
     end
 
     def attributes_for(headers, row)
-      headers.each_with_index.each_with_object({}) do |(header, index), attributes|
+      headers.each_with_object({}).with_index do |(header, attributes), index|
         key = HEADER_MAP[header]
         attributes[key] = row[index].to_s.strip if key
       end
@@ -299,14 +297,8 @@ module Pharma
       row.all? { |value| value.to_s.strip.blank? }
     end
 
-    def import_status(total_rows:, failed_rows:)
-      if total_rows.zero?
-        'completed'
-      elsif failed_rows.zero?
-        'completed'
-      else
-        'completed_with_errors'
-      end
+    def import_status(failed_rows:)
+      failed_rows.zero? ? 'completed' : 'completed_with_errors'
     end
 
     def normalized_temperature_control(value)
