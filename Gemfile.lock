@@ -331,7 +331,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.19.8)
+    json (2.19.9)
     jwt (3.2.0)
       base64
     kaminari (1.2.2)
@@ -470,7 +470,7 @@ GEM
     pg (1.6.3-x86_64-darwin)
     pg (1.6.3-x86_64-linux)
     pg (1.6.3-x86_64-linux-musl)
-    phonelib (0.10.21)
+    phonelib (0.10.22)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -781,20 +781,20 @@ GEM
       paypal-server-sdk (~> 1.1)
       spree (>= 5.4.0)
       spree_admin (>= 5.4.0)
-    spree_stripe (1.7.0)
+    spree_stripe (1.7.1)
       spree (>= 5.4.0.beta)
       spree_admin (>= 5.4.0.beta)
       stripe (>= 10.1, < 19)
       stripe_event (~> 2.14)
     sqids (0.2.2)
     ssrf_filter (1.5.0)
-    state_machines (0.101.0)
-    state_machines-activemodel (0.102.0)
+    state_machines (0.201.0)
+    state_machines-activemodel (0.200.0)
       activemodel (>= 7.2)
-      state_machines (>= 0.101.0)
-    state_machines-activerecord (0.103.0)
+      state_machines (>= 0.200.0)
+    state_machines-activerecord (0.200.0)
       activerecord (>= 7.2)
-      state_machines-activemodel (>= 0.102.0)
+      state_machines-activemodel (>= 0.200.0)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
     stringex (2.8.6)
@@ -1038,7 +1038,7 @@ CHECKSUMS
   io-stream (0.13.0) sha256=ce24bccb302bdf3ecedef05e8669a687b461621a498d83622fdcab549c9c1636
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   jmespath (1.6.2) sha256=238d774a58723d6c090494c8879b5e9918c19485f7e840f2c1c7532cf84ebcb1
-  json (2.19.8) sha256=6354310fd76ef69b87d5bd1f38b40d730613baf90b6803d2d0a48f618d32dfaa
+  json (2.19.9) sha256=9b9025b7cdddafa38d316eca0b2358488e42d417045c1b90d216a9fefe46b79a
   jwt (3.2.0) sha256=5419b1fe37b1da0982bd07051f573a8b8789ab724c2aa7e785e4784a3ed217d7
   kaminari (1.2.2) sha256=c4076ff9adccc6109408333f87b5c4abbda5e39dc464bd4c66d06d9f73442a3e
   kaminari-actionview (1.2.2) sha256=1330f6fc8b59a4a4ef6a549ff8a224797289ebf7a3a503e8c1652535287cc909
@@ -1105,7 +1105,7 @@ CHECKSUMS
   pg (1.6.3-x86_64-darwin) sha256=ee2e04a17c0627225054ffeb43e31a95be9d7e93abda2737ea3ce4a62f2729d6
   pg (1.6.3-x86_64-linux) sha256=5d9e188c8f7a0295d162b7b88a768d8452a899977d44f3274d1946d67920ae8d
   pg (1.6.3-x86_64-linux-musl) sha256=9c9c90d98c72f78eb04c0f55e9618fe55d1512128e411035fe229ff427864009
-  phonelib (0.10.21) sha256=ff5a2f3899f0f8cf198fc07746adbb1b5b2bb5dd2332bc5aff32c4ccfb471702
+  phonelib (0.10.22) sha256=072183c6b85408f43e5d0ab116ed1b2707f0a324e6efe1f3d866ff900f104daf
   pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
   prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
@@ -1185,12 +1185,12 @@ CHECKSUMS
   spree_extension (1.0.2) sha256=71725dafe45319a2be1bd2b564a416afe8029af8e18ac703bdb835e09553e1df
   spree_i18n (5.3.2) sha256=03b805235ca156644951f6bc3d07cbe43d0aa01134c4a27e3f3304011956f79b
   spree_paypal_checkout (0.7.1) sha256=89a5715a3b23b2ac04a27ddfd12416101fab03996cf70826d35dedef3bb4b9de
-  spree_stripe (1.7.0) sha256=f9d5d5c57fa9ba8c072151b46c4aaa7a7ad27b409acdbe767bfe92e739d90452
+  spree_stripe (1.7.1) sha256=55d5846709fc43a0442068577fb0dc43bd25d14abf66352a37272e2ac4f95ce5
   sqids (0.2.2) sha256=c2d31e0dfb6c32d17c10b59df059a299af93bef716d700ff70d77156df702d36
   ssrf_filter (1.5.0) sha256=e03dcdb9d1730d7f6710532a606b3543df2a448a0293ce04a2d995523c5a97f6
-  state_machines (0.101.0) sha256=cbcec89699a0388493226a4b18d790bd5d49c38ba782d2099342a3dd78bcbca3
-  state_machines-activemodel (0.102.0) sha256=871ac36194227c17f61053c3cfe61606f0a23e62e3ec8715f61fc6a3f94ba274
-  state_machines-activerecord (0.103.0) sha256=7c774b5a47a0de8496130e7e69e6f959d3e2b1f1b7e682c24f95bfa670b5b3cc
+  state_machines (0.201.0) sha256=807bafdd5d7dbfb3e23d77897edfe38e505b6e0738a2b7259dab566f46b9d319
+  state_machines-activemodel (0.200.0) sha256=c0216f5730b00ee240a6370d59138e8d5d966752089a749ae015410185ec953e
+  state_machines-activerecord (0.200.0) sha256=a53a1c09b478f05be9385af59e09a7a84a818c6a66651e432bfa4650d5917d85
   stimulus-rails (1.3.4) sha256=765676ffa1f33af64ce026d26b48e8ffb2e0b94e0f50e9119e11d6107d67cb06
   stringex (2.8.6) sha256=c7b382d2b2a47a1e1646f256df201c48d487d6296fbb289d76802f67f5e929c4
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
