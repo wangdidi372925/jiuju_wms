@@ -21,10 +21,15 @@ Rails.application.routes.draw do
       namespace :api do
         namespace :v1 do
           resources :drug_masters, only: %i[index show create update]
+          resources :drug_batch_stocks, only: %i[create update]
           resources :order_allocations, only: :create
           resources :pharmacies, only: %i[index show] do
             patch :review, on: :member
           end
+          resources :supplier_offers, only: %i[index show create update] do
+            resources :regions, only: :create, controller: :supplier_offer_regions
+          end
+          resources :supplier_offer_regions, only: :update
           resources :suppliers, only: %i[index show create update] do
             resources :licenses, only: :create, controller: :supplier_licenses
             resources :warehouses, only: :create, controller: :supplier_warehouses
