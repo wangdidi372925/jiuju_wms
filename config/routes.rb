@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     namespace :admin do
       namespace :api do
         namespace :v1 do
+          resources :drug_masters, only: %i[index show create update]
           resources :order_allocations, only: :create
           resources :pharmacies, only: %i[index show] do
             patch :review, on: :member
