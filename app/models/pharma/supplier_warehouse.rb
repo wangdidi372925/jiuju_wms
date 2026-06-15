@@ -2,6 +2,8 @@
 
 module Pharma
   class SupplierWarehouse < ApplicationRecord
+    STATUSES = %w[active suspended closed].freeze
+
     enum :status, {
       active: 'active',
       suspended: 'suspended',
@@ -14,7 +16,7 @@ module Pharma
 
     validates :name, :code, :province, :city, :address, presence: true
     validates :code, uniqueness: true
-    validates :status, inclusion: { in: statuses.keys }
+    validates :status, inclusion: { in: STATUSES }
 
     def region_label
       [province, city, district].compact_blank.join(' / ')

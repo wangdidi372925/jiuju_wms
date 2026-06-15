@@ -2,6 +2,8 @@
 
 module Pharma
   class Supplier < ApplicationRecord
+    STATUSES = %w[pending approved suspended rejected].freeze
+
     enum :status, {
       pending: 'pending',
       approved: 'approved',
@@ -21,7 +23,7 @@ module Pharma
     validates :name, :code, :contact_name, :contact_phone, :province, :city, presence: true
     validates :code, uniqueness: true
     validates :priority, numericality: { only_integer: true }
-    validates :status, inclusion: { in: statuses.keys }
+    validates :status, inclusion: { in: STATUSES }
 
     def active_for_offers?
       approved? && supplier_licenses.any?(&:effective?)
