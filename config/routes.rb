@@ -28,6 +28,10 @@ Rails.application.routes.draw do
 
     namespace :api do
       namespace :v1 do
+        resources :pharmacies, only: :create, param: :code do
+          resources :licenses, only: :create, controller: :pharmacy_licenses
+        end
+
         resources :drugs, only: :index do
           get :offers, on: :member
         end
