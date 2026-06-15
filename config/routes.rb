@@ -21,6 +21,12 @@ Rails.application.routes.draw do
       namespace :api do
         namespace :v1 do
           resources :order_allocations, only: :create
+          resources :pharmacies, only: %i[index show] do
+            patch :review, on: :member
+          end
+          resources :pharmacy_licenses, only: [] do
+            patch :review, on: :member
+          end
           resource :supplier_visibility_config, only: %i[show update]
         end
       end
