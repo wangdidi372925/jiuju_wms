@@ -1,0 +1,76 @@
+<script>
+  (function () {
+    var trixLang = {
+      attachFiles: '上传附件',
+      bold: '加粗',
+      bullets: '项目符号',
+      captionPlaceholder: '添加说明...',
+      code: '代码',
+      embed: '嵌入',
+      embedVideo: '嵌入视频',
+      heading1: '标题',
+      indent: '增加缩进',
+      italic: '斜体',
+      link: '链接',
+      numbers: '编号',
+      outdent: '减少缩进',
+      quote: '引用',
+      redo: '重做',
+      remove: '移除',
+      strike: '删除线',
+      undo: '撤销',
+      unlink: '取消链接',
+      url: 'URL',
+      urlPlaceholder: '输入 URL...'
+    };
+
+    function localizeTrix() {
+      if (!window.Trix || !Trix.config || !Trix.config.lang) return;
+      Object.assign(Trix.config.lang, trixLang);
+    }
+
+    var textMap = {
+      'Add Products': '添加产品',
+      'Automatic Promotion': '自动促销',
+      'Copy To Clipboard': '复制到剪贴板',
+      'Copy to clipboard': '复制到剪贴板',
+      'Default': '默认',
+      'Event Subscriptions Help': '选择哪些事件会触发该端点的 Webhook 投递。',
+      'No Report Data': '暂无报表数据',
+      'Remove': '移除',
+      'browse files': '选择文件'
+    };
+
+    function replaceNodeText(node) {
+      var value = (node.textContent || '').trim();
+      if (textMap[value]) node.textContent = textMap[value];
+    }
+
+    function localizeStaticText(root) {
+      var scope = root || document;
+      if (!scope.querySelectorAll) return;
+
+      scope.querySelectorAll('button, a, label, p, span, small, option, [title], [aria-label]').forEach(function (node) {
+        replaceNodeText(node);
+        ['title', 'aria-label'].forEach(function (attr) {
+          var value = node.getAttribute(attr);
+          if (value && textMap[value]) node.setAttribute(attr, textMap[value]);
+        });
+      });
+    }
+
+    document.addEventListener('trix-before-initialize', localizeTrix);
+    document.addEventListener('trix-initialize', localizeTrix);
+    document.addEventListener('DOMContentLoaded', function () { localizeStaticText(document); });
+    document.addEventListener('turbo:load', function () { localizeStaticText(document); });
+    document.addEventListener('turbo:frame-load', function (event) { localizeStaticText(event.target); });
+
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        mutation.addedNodes.forEach(function (node) {
+          if (node.nodeType === Node.ELEMENT_NODE) localizeStaticText(node);
+        });
+      });
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  })();
+</script>

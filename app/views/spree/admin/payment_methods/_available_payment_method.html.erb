@@ -1,0 +1,33 @@
+<% payment_method_descriptions = {
+  'Adyen' => '统一处理支付、数据和财务管理的支付平台。',
+  'Check' => '用于线下付款、转账或人工确认的支付方式。',
+  'PayPal' => '支持客户使用 PayPal 完成线上支付。',
+  'Stripe' => '支持信用卡、钱包等主流线上支付方式。'
+} %>
+<% payment_method_names = {
+  'Check' => '线下付款'
+} %>
+
+<tr data-controller="row-link">
+  <td class="cursor-pointer w-30" data-action="click->row-link#openLink">
+    <div class="flex items-center">
+      <% if payment_method_icon_tag(payment_method.payment_icon_name).present? %>
+        <%= payment_method_icon_tag(payment_method.payment_icon_name, height: 30, class: 'mr-2') %>
+      <% end %>
+
+      <%= payment_method_names.fetch(payment_method.name, payment_method.name) %>
+    </div>
+  </td>
+  <td class="cursor-pointer w-40 whitespace-normal" data-action="click->row-link#openLink">
+    <%= payment_method_descriptions.fetch(payment_method.name, '可用于扩展店铺支付能力。') %>
+  </td>
+  <td class="actions w-30">
+    <div class="flex justify-end">
+      <%= link_to_with_icon 'plus',
+            Spree.t(:add),
+            spree.new_admin_payment_method_path(payment_method: { type: payment_method.type }),
+            class: 'btn btn-light btn-sm',
+            data: { row_link_target: :link, turbo_frame: '_top' } %>
+    </div>
+  </td>
+</tr>

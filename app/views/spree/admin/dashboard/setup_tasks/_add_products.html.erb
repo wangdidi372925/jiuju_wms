@@ -1,0 +1,22 @@
+<% if done %>
+  <p>
+    已经添加产品。
+  </p>
+  <p>
+    后续也可以继续添加更多产品。
+  </p>
+<% else %>
+  <p>
+    添加药店可采购的产品，也可以后续接入货盘方共同供货。
+  </p>
+  <p>
+    支持通过 CSV 或 Excel 文件批量导入产品。
+  </p>
+<% end %>
+
+<div class="flex gap-3">
+  <%= link_to_with_icon 'plus', Spree.t(:add_product), spree.new_admin_product_path, class: 'btn btn-primary', data: { turbo_frame: '_top' } if can?(:create, Spree::Product) %>
+  <%= link_to_with_icon 'table-import', Spree.t(:import), spree.new_admin_import_path(type: 'Spree::Imports::Products'), class: 'btn btn-light', data: { action: 'drawer#open', turbo_frame: :drawer } if can?(:create, Spree::Import) %>
+
+  <%= invite_vendor_button(class: 'btn btn-light') if defined?(invite_vendor_button) %>
+</div>

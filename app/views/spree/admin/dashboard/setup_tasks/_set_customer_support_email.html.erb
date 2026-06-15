@@ -1,0 +1,20 @@
+<%= turbo_frame_tag :set_customer_support_email, class: 'w-full' do %>
+  <div class="alert alert-info">
+    客服邮箱会显示在前台，方便药店客户咨询订单、配送和售后问题。
+  </div>
+
+  <% if done %>
+    <p class="mb-3">
+      当前客服邮箱为 <strong><%= current_store.customer_support_email %></strong>。
+    </p>
+    <%= link_to_with_icon 'edit', Spree.t(:edit), spree.edit_emails_admin_store_path, class: 'btn btn-light' %>
+  <% else %>
+    <%= form_for current_store, url: spree.admin_store_path, as: :store do |f| %>
+      <div class="form-group">
+        <%= f.label :customer_support_email, '客服邮箱' %>
+        <%= f.email_field :customer_support_email, class: 'form-input', required: true %>
+      </div>
+      <%= turbo_save_button_tag %>
+    <% end %>
+  <% end %>
+<% end %>

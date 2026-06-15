@@ -1,0 +1,71 @@
+<div class="card mb-6 animate-pulse">
+  <div class="card-header block border-0 h-auto p-2">
+    <div class="grid grid-cols-12">
+      <div class="col-span-6 lg:col-span-4 gap-2">
+        <div class="analytics-card-tab active" style="min-height: 82px;">
+          <div class="flex justify-center flex-col mb-6 lg:mb-0">
+            <span class="text-sm text-gray-600">销售总额</span>
+            <span class="text-lg text-gray-900 font-bold mt-1">
+              <%= @sales_total %>
+            </span>
+            <div>
+              <%= render 'spree/admin/shared/growth_rate_badge', growth_rate: 0 %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-span-6 lg:col-span-2">
+        <div class="analytics-card-tab" >
+          <div class="flex justify-center flex-col mb-6 lg:mb-0">
+            <span class="text-sm text-gray-600">平均客单价</span>
+            <span class="text-lg text-gray-900 font-bold mt-1 mr-3"><%= @orders_average %></span>
+            <div>
+              <%= render 'spree/admin/shared/growth_rate_badge', growth_rate: 0 %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-span-6 lg:col-span-2">
+        <div class="analytics-card-tab" >
+          <div class="flex justify-center flex-col mb-6 lg:mb-0">
+            <span class="text-sm text-gray-600">订单总数</span>
+            <span class="text-lg text-gray-900 font-bold mt-1 mr-3"><%= @orders_total  %></span>
+            <div>
+              <%= render 'spree/admin/shared/growth_rate_badge', growth_rate: 0 %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% if defined?(Ahoy) %>
+        <div class="col-span-6 lg:col-span-2">
+          <div class="analytics-card-tab" >
+            <div class="flex justify-center flex-col">
+              <span class="text-sm text-gray-600">访问量</span>
+              <span class="text-lg text-gray-900 font-bold mt-1 mr-3"><%= @visits_total %></span>
+              <div>
+                <%= render 'spree/admin/shared/growth_rate_badge', growth_rate: 0 %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="col-span-6 lg:col-span-2">
+        <div class="analytics-card-tab" >
+          <div class="flex justify-center flex-col">
+            <span class="text-sm text-gray-600">注册数</span>
+            <span class="text-lg text-gray-900 font-bold mt-1 mr-3"><%= @audience_total %></span>
+            <div>
+              <%= render 'spree/admin/shared/growth_rate_badge', growth_rate: 0 %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body p-2">
+    <%= render 'spree/admin/shared/spinner' %>
+  </div>
+</div>

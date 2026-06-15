@@ -1,0 +1,63 @@
+<div data-controller="reveal" data-reveal-hidden-class="hidden">
+  <div class="custom-control custom-radio">
+    <%= f.radio_button :kind, :coupon_code, data: { action: 'change->reveal#show' }, class: 'custom-control-input' %>
+    <%= f.label :kind_coupon_code, Spree.t(:coupon_code), class: 'custom-control-label' %>
+
+    <div data-reveal-target="item" class="rounded-md p-6 bg-gray-25 mt-6 <% if @promotion.automatic? %>hidden<% end %>">
+      <div data-controller="reveal" data-reveal-hidden-class="hidden">
+        <div class="custom-control custom-radio">
+          <%= f.radio_button :multi_codes, false, data: { action: 'change->reveal#toggle' }, class: 'custom-control-input' %>
+          <%= f.label :multi_codes_false, class: 'custom-control-label flex-col items-start' do %>
+            所有客户共用一个优惠码
+            <span class="form-text font-normal">
+              可以限制这个优惠码的使用次数。
+            </span>
+          <% end %>
+        </div>
+        <div data-reveal-target="item" class="mt-2 ml-6 <% if @promotion.multi_codes? %>hidden<% end %>">
+          <%= f.text_field :code, class: 'form-input uppercase', placeholder: '输入优惠码' %>
+        </div>
+
+        <div class="mt-6 custom-control custom-radio">
+          <%= f.radio_button :multi_codes, true, data: { action: 'change->reveal#toggle' }, class: 'custom-control-input' %>
+          <%= f.label :multi_codes_true, class: 'custom-control-label flex-col items-start' do %>
+            生成唯一优惠码
+            <span class="form-text font-normal">
+              系统会自动生成优惠码，并可下载为 CSV 文件。每个优惠码唯一且只能使用一次。
+            </span>
+          <% end %>
+        </div>
+        <div data-reveal-target="item" class="ml-6 mt-2 grid gap-3 <% unless @promotion.multi_codes? %>hidden<% end %>">
+          <div>
+            <%= f.text_field :code_prefix, class: 'form-input uppercase', placeholder: '优惠码前缀（可选）' %>
+            <span class="form-text mt-1">
+              例如 <strong>ABC</strong>
+            </span>
+          </div>
+          <div>
+            <% minimum_number_of_codes = @promotion.persisted? && @promotion.coupon_codes.count.positive? ? @promotion.coupon_codes.count : 1 %>
+            <% maximum_number_of_codes = ENV.fetch('PROMOTION_MAX_NUMBER_OF_CODES', 5000) %>
+            <%= f.number_field :number_of_codes, class: 'form-input', placeholder: '优惠码数量', min: minimum_number_of_codes, max: maximum_number_of_codes, step: 1 %>
+            <span class="form-text mt-1">
+              填写需要生成的优惠码数量。
+              <% if @promotion.persisted? %>
+                如需增加优惠码，请调大这个数量。
+              <% end %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 custom-control custom-radio">
+    <%= f.radio_button :kind, :automatic, data: { action: 'change->reveal#hide' }, class: 'custom-control-input' %>
+    <%= f.label :kind_automatic, Spree.t(:automatic_promotion), class: 'custom-control-label flex-col items-start' do %>
+      <%= Spree.t(:automatic_promotion) %>
+      <span class="form-text font-normal">
+        该促销会自动应用到所有符合条件的订单。
+      </span>
+    <% end %>
+
+  </div>
+</div>

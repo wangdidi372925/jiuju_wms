@@ -1,0 +1,12 @@
+<% resource_name ||= model_class.name.demodulize.underscore.humanize if local_assigns[:model_class].present? %>
+<% resource_name ||= Spree.t(:resource) %>
+
+<div class="text-gray-600 p-12 flex items-center w-full justify-center flex-col gap-4">
+  <%= icon 'map-search', class: 'opacity-50 text-4xl' %>
+  <p>
+    <%= Spree.t(:no_resource_found, resource: resource_name) %>
+  </p>
+  <% if local_assigns[:model_class].present? && can?(:create, model_class) && defined?(new_object_url) && new_object_url.present? %>
+    <%= link_to_with_icon 'plus', Spree.t(:add_one), new_object_url, class: 'btn btn-primary btn-sm', data: { 'turbo-frame': '_top' } %>
+  <% end %>
+</div>

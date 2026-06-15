@@ -1,0 +1,18 @@
+<div class="card mb-6" id="setup_progress">
+  <div class="card-body">
+    <div class="mb-4">
+      总体配置进度
+      <span class="float-right badge badge-<%= current_store.setup_completed? ? 'success' : 'info' %>">
+        <% if current_store.setup_completed? %>
+          <%= icon('check', class: 'text-green-700') %>
+        <% end %>
+
+        <span>
+          已完成 <strong><%= current_store.setup_tasks_done %></strong> / <%= current_store.setup_tasks_total %> 项
+        </span>
+      </span>
+    </div>
+
+    <%= progress_bar_component(current_store.setup_percentage) %>
+  </div>
+</div>

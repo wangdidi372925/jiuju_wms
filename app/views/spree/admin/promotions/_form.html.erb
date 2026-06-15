@@ -1,0 +1,36 @@
+<div class="card mb-6">
+  <div class="card-header">
+    <h5 class="card-title">
+      <%= Spree.t(:details) %>
+    </h5>
+  </div>
+  <div class="card-body">
+    <%= f.spree_text_field :name, required: true, autofocus: true, help: '客户会在购物车和结算页看到这个促销名称。' %>
+  </div>
+</div>
+
+<div class="card mb-6">
+  <div class="card-header">
+    <h5 class="card-title">
+      <%= Spree.t(:kind) %>
+    </h5>
+  </div>
+  <div class="card-body">
+    <%= render 'spree/admin/promotions/form/kind', f: f %>
+  </div>
+</div>
+
+<div class="card mb-6">
+  <div class="card-header">
+    <h5 class="card-title">
+      <%= Spree.t(:settings) %>
+    </h5>
+  </div>
+  <div class="card-body">
+    <%= render 'spree/admin/promotions/form/settings', f: f %>
+  </div>
+</div>
+
+<p class="alert alert-info text-center">
+  下一步可以为该促销添加动作和规则。
+</p>

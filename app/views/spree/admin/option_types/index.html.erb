@@ -1,0 +1,22 @@
+<% content_for :page_title do %>
+  <%= Spree.t(:options) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <%= render_admin_partials(:option_types_actions_partials) %>
+  <%= link_to_with_icon 'plus', Spree.t(:new_option_type), new_object_url, class: 'btn btn-primary' if can?(:create, Spree::OptionType) %>
+<% end %>
+
+<%= content_for(:page_alerts) do %>
+  <div class="alert alert-info">
+    规格选项用于归类商品属性。例如可以创建“规格”选项，再为它添加“10片/盒”“20片/盒”等选项值。
+  </div>
+<% end %>
+
+<%= render_admin_partials(:option_types_header_partials) %>
+
+<%= render_table @collection, :option_types, sortable: true %>
+
+<p class="documentation-link-container">
+  <%= external_link_to '了解规格选项', 'https://spreecommerce.org/docs/user/manage-products/product-options' %>
+</p>
