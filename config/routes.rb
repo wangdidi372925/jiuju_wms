@@ -15,6 +15,17 @@ Rails.application.routes.draw do
       router_name: :spree
     )
   end
+
+  namespace :pharma do
+    namespace :api do
+      namespace :v1 do
+        resources :drugs, only: :index do
+          get :offers, on: :member
+        end
+      end
+    end
+  end
+
   # This line mounts Spree's routes at the root of your application.
   # This means, any requests to URLs such as /products, will go to
   # Spree::ProductsController.
