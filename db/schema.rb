@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_14_002000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_14_003000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -127,6 +127,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_002000) do
     t.index ["spree_variant_id"], name: "index_pharma_drug_variant_links_on_spree_variant_id", unique: true
   end
 
+  create_table "pharma_order_allocations", force: :cascade do |t|
+    t.integer "allocated_quantity", null: false
+    t.decimal "allocated_unit_price", precision: 12, scale: 2, null: false
+    t.string "batch_no_snapshot", null: false
+    t.datetime "created_at", null: false
+    t.bigint "drug_batch_stock_id", null: false
+    t.date "expiry_date_snapshot", null: false
+    t.bigint "spree_line_item_id", null: false
+    t.bigint "spree_order_id", null: false
+    t.string "status", default: "allocated", null: false
+    t.bigint "supplier_id", null: false
+    t.string "supplier_name_snapshot", null: false
+    t.bigint "supplier_offer_id", null: false
+    t.bigint "supplier_warehouse_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["drug_batch_stock_id"], name: "index_pharma_order_allocations_on_drug_batch_stock_id"
+    t.index ["spree_line_item_id"], name: "index_pharma_order_allocations_on_spree_line_item_id"
+    t.index ["spree_order_id"], name: "index_pharma_order_allocations_on_spree_order_id"
+    t.index ["status"], name: "index_pharma_order_allocations_on_status"
+    t.index ["supplier_id"], name: "index_pharma_order_allocations_on_supplier_id"
+    t.index ["supplier_offer_id"], name: "index_pharma_order_allocations_on_supplier_offer_id"
+    t.index ["supplier_warehouse_id"], name: "index_pharma_order_allocations_on_supplier_warehouse_id"
+  end
+
   create_table "pharma_pharmacies", force: :cascade do |t|
     t.string "address", null: false
     t.string "city", null: false
@@ -156,6 +180,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_002000) do
     t.index ["pharmacy_id", "license_type", "license_no"], name: "idx_pharma_pharmacy_licenses_unique_license", unique: true
     t.index ["pharmacy_id"], name: "index_pharma_pharmacy_licenses_on_pharmacy_id"
     t.index ["status"], name: "index_pharma_pharmacy_licenses_on_status"
+  end
+
+  create_table "pharma_supplier_fulfillments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "delivery_company"
+    t.string "delivery_tracking_no"
+    t.string "fulfillment_no", null: false
+    t.datetime "received_at"
+    t.datetime "shipped_at"
+    t.bigint "spree_order_id", null: false
+    t.string "status", default: "pending", null: false
+    t.bigint "supplier_id", null: false
+    t.bigint "supplier_warehouse_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fulfillment_no"], name: "index_pharma_supplier_fulfillments_on_fulfillment_no", unique: true
+    t.index ["spree_order_id"], name: "index_pharma_supplier_fulfillments_on_spree_order_id"
+    t.index ["status"], name: "index_pharma_supplier_fulfillments_on_status"
+    t.index ["supplier_id"], name: "index_pharma_supplier_fulfillments_on_supplier_id"
+    t.index ["supplier_warehouse_id"], name: "index_pharma_supplier_fulfillments_on_supplier_warehouse_id"
   end
 
   create_table "pharma_supplier_licenses", force: :cascade do |t|
@@ -2420,7 +2463,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_002000) do
   add_foreign_key "pharma_drug_batch_stocks", "pharma_supplier_warehouses", column: "supplier_warehouse_id"
   add_foreign_key "pharma_drug_batch_stocks", "pharma_suppliers", column: "supplier_id"
   add_foreign_key "pharma_drug_variant_links", "pharma_drug_masters", column: "drug_master_id"
+  add_foreign_key "pharma_order_allocations", "pharma_drug_batch_stocks", column: "drug_batch_stock_id"
+  add_foreign_key "pharma_order_allocations", "pharma_supplier_offers", column: "supplier_offer_id"
+  add_foreign_key "pharma_order_allocations", "pharma_supplier_warehouses", column: "supplier_warehouse_id"
+  add_foreign_key "pharma_order_allocations", "pharma_suppliers", column: "supplier_id"
   add_foreign_key "pharma_pharmacy_licenses", "pharma_pharmacies", column: "pharmacy_id"
+  add_foreign_key "pharma_supplier_fulfillments", "pharma_supplier_warehouses", column: "supplier_warehouse_id"
+  add_foreign_key "pharma_supplier_fulfillments", "pharma_suppliers", column: "supplier_id"
   add_foreign_key "pharma_supplier_licenses", "pharma_suppliers", column: "supplier_id"
   add_foreign_key "pharma_supplier_offer_regions", "pharma_supplier_offers", column: "supplier_offer_id"
   add_foreign_key "pharma_supplier_offers", "pharma_drug_masters", column: "drug_master_id"
