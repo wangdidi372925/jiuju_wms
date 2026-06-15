@@ -25,6 +25,12 @@ Rails.application.routes.draw do
           resources :pharmacies, only: %i[index show] do
             patch :review, on: :member
           end
+          resources :suppliers, only: %i[index show create update] do
+            resources :licenses, only: :create, controller: :supplier_licenses
+            resources :warehouses, only: :create, controller: :supplier_warehouses
+          end
+          resources :supplier_licenses, only: :update
+          resources :supplier_warehouses, only: :update
           resources :pharmacy_licenses, only: [] do
             patch :review, on: :member
           end
