@@ -96,13 +96,13 @@ RSpec.describe 'Pharma fulfillment models', type: :model do
     Spree::LineItem.find(result.rows.first.first)
   end
 
-  def allocation_attributes(order:, line_item:, supplier:, warehouse:, offer:, stock:)
+  def allocation_attributes(order:, line_item:, supplier:, warehouse:, stock:)
     {
       spree_order_id: order.id,
       spree_line_item_id: line_item.id,
       supplier: supplier,
       supplier_warehouse: warehouse,
-      supplier_offer: offer,
+      supplier_offer: stock.supplier_offer,
       drug_batch_stock: stock,
       supplier_name_snapshot: supplier.name,
       batch_no_snapshot: stock.batch_no,
@@ -128,7 +128,6 @@ RSpec.describe 'Pharma fulfillment models', type: :model do
         line_item: line_item,
         supplier: supplier,
         warehouse: warehouse,
-        offer: offer,
         stock: stock
       )
     )
@@ -154,7 +153,6 @@ RSpec.describe 'Pharma fulfillment models', type: :model do
         line_item: line_item,
         supplier: other_supplier,
         warehouse: other_warehouse,
-        offer: offer,
         stock: stock
       )
     )
@@ -180,7 +178,6 @@ RSpec.describe 'Pharma fulfillment models', type: :model do
         line_item: line_item,
         supplier: supplier,
         warehouse: warehouse,
-        offer: offer,
         stock: stock
       )
     )

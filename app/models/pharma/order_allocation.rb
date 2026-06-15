@@ -33,9 +33,7 @@ module Pharma
       return if drug_batch_stock.blank?
 
       errors.add(:supplier, 'must match drug_batch_stock') if supplier_id != drug_batch_stock.supplier_id
-      if supplier_warehouse_id != drug_batch_stock.supplier_warehouse_id
-        errors.add(:supplier_warehouse, 'must match drug_batch_stock')
-      end
+      errors.add(:supplier_warehouse, 'must match drug_batch_stock') if supplier_warehouse_id != drug_batch_stock.supplier_warehouse_id
       errors.add(:supplier_offer, 'must match drug_batch_stock') if supplier_offer_id != drug_batch_stock.supplier_offer_id
     end
 

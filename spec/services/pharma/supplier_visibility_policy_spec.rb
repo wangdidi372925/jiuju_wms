@@ -62,7 +62,7 @@ RSpec.describe Pharma::SupplierVisibilityPolicy do
   end
 
   it 'rejects unknown visibility modes' do
-    expect { described_class.new(mode: 'unknown') }
-      .to raise_error(ArgumentError, 'unknown supplier visibility mode: unknown')
+    expect { described_class.new(mode: 'unknown') }.
+      to raise_error(ArgumentError, 'unknown supplier visibility mode: unknown')
   end
 end

@@ -40,10 +40,10 @@ RSpec.describe 'Pharma party models', type: :model do
           expect(build_pharmacy(status: :approved, license_status: license_status)).not_to be_purchasing_enabled
         end
 
-        expect(build_pharmacy(status: :approved, starts_on: 2.days.ago.to_date, expires_on: 1.day.ago.to_date))
-          .not_to be_purchasing_enabled
-        expect(build_pharmacy(status: :approved, starts_on: 1.day.from_now.to_date, expires_on: 2.days.from_now.to_date))
-          .not_to be_purchasing_enabled
+        expect(build_pharmacy(status: :approved, starts_on: 2.days.ago.to_date, expires_on: 1.day.ago.to_date)).
+          not_to be_purchasing_enabled
+        expect(build_pharmacy(status: :approved, starts_on: 1.day.from_now.to_date, expires_on: 2.days.from_now.to_date)).
+          not_to be_purchasing_enabled
       end
     end
   end
@@ -86,10 +86,10 @@ RSpec.describe 'Pharma party models', type: :model do
           expect(build_supplier(status: :approved, license_status: license_status)).not_to be_active_for_offers
         end
 
-        expect(build_supplier(status: :approved, starts_on: 2.days.ago.to_date, expires_on: 1.day.ago.to_date))
-          .not_to be_active_for_offers
-        expect(build_supplier(status: :approved, starts_on: 1.day.from_now.to_date, expires_on: 2.days.from_now.to_date))
-          .not_to be_active_for_offers
+        expect(build_supplier(status: :approved, starts_on: 2.days.ago.to_date, expires_on: 1.day.ago.to_date)).
+          not_to be_active_for_offers
+        expect(build_supplier(status: :approved, starts_on: 1.day.from_now.to_date, expires_on: 2.days.from_now.to_date)).
+          not_to be_active_for_offers
       end
     end
   end

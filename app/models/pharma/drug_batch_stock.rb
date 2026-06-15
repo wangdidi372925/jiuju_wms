@@ -42,9 +42,7 @@ module Pharma
       return if supplier_offer.blank?
 
       errors.add(:supplier, 'must match supplier_offer') if supplier_id != supplier_offer.supplier_id
-      if supplier_warehouse_id != supplier_offer.supplier_warehouse_id
-        errors.add(:supplier_warehouse, 'must match supplier_offer')
-      end
+      errors.add(:supplier_warehouse, 'must match supplier_offer') if supplier_warehouse_id != supplier_offer.supplier_warehouse_id
       errors.add(:drug_master, 'must match supplier_offer') if drug_master_id != supplier_offer.drug_master_id
     end
   end
