@@ -54,6 +54,11 @@ Rails.application.routes.draw do
           resources :licenses, only: :create, controller: :pharmacy_licenses
         end
 
+        resources :carts, only: %i[create show], param: :number do
+          post :checkout, on: :member
+          post :items, on: :member, action: :add_item
+        end
+
         resources :drugs, only: :index do
           get :offers, on: :member
         end
