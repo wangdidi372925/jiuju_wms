@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_15_104000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_15_121000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -76,6 +76,46 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_104000) do
     t.index ["slug", "sluggable_type", "scope", "locale"], name: "index_friendly_id_slugs_unique", unique: true
     t.index ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
     t.index ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
+  end
+
+  create_table "pharma_admin_api_clients", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "last_used_at"
+    t.string "name", null: false
+    t.string "role", default: "viewer", null: false
+    t.string "status", default: "active", null: false
+    t.string "token_digest", null: false
+    t.string "token_prefix", null: false
+    t.datetime "updated_at", null: false
+    t.index ["role"], name: "index_pharma_admin_api_clients_on_role"
+    t.index ["status"], name: "index_pharma_admin_api_clients_on_status"
+    t.index ["token_digest"], name: "index_pharma_admin_api_clients_on_token_digest", unique: true
+    t.index ["token_prefix"], name: "index_pharma_admin_api_clients_on_token_prefix"
+  end
+
+  create_table "pharma_admin_audit_logs", force: :cascade do |t|
+    t.string "action_name", null: false
+    t.string "actor_name"
+    t.string "actor_role"
+    t.bigint "admin_api_client_id"
+    t.string "controller_path", null: false
+    t.datetime "created_at", null: false
+    t.string "error_code"
+    t.string "ip_address"
+    t.datetime "occurred_at", null: false
+    t.string "path", null: false
+    t.string "request_method", null: false
+    t.jsonb "request_params", default: {}, null: false
+    t.integer "status", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.index ["actor_role"], name: "index_pharma_admin_audit_logs_on_actor_role"
+    t.index ["admin_api_client_id"], name: "index_pharma_admin_audit_logs_on_admin_api_client_id"
+    t.index ["controller_path", "action_name"], name: "idx_on_controller_path_action_name_5001415aa9"
+    t.index ["error_code"], name: "index_pharma_admin_audit_logs_on_error_code"
+    t.index ["occurred_at"], name: "index_pharma_admin_audit_logs_on_occurred_at"
+    t.index ["request_method"], name: "index_pharma_admin_audit_logs_on_request_method"
+    t.index ["status"], name: "index_pharma_admin_audit_logs_on_status"
   end
 
   create_table "pharma_drug_batch_stocks", force: :cascade do |t|
@@ -180,6 +220,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_104000) do
     t.index ["status"], name: "index_pharma_pharmacies_on_status"
   end
 
+  create_table "pharma_pharmacy_api_tokens", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.datetime "last_used_at"
+    t.bigint "pharmacy_user_id", null: false
+    t.datetime "revoked_at"
+    t.string "token_digest", null: false
+    t.string "token_prefix", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_pharma_pharmacy_api_tokens_on_expires_at"
+    t.index ["pharmacy_user_id"], name: "index_pharma_pharmacy_api_tokens_on_pharmacy_user_id"
+    t.index ["revoked_at"], name: "index_pharma_pharmacy_api_tokens_on_revoked_at"
+    t.index ["token_digest"], name: "index_pharma_pharmacy_api_tokens_on_token_digest", unique: true
+    t.index ["token_prefix"], name: "index_pharma_pharmacy_api_tokens_on_token_prefix"
+  end
+
   create_table "pharma_pharmacy_licenses", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "expires_on", null: false
@@ -193,6 +249,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_104000) do
     t.index ["pharmacy_id", "license_type", "license_no"], name: "idx_pharma_pharmacy_licenses_unique_license", unique: true
     t.index ["pharmacy_id"], name: "index_pharma_pharmacy_licenses_on_pharmacy_id"
     t.index ["status"], name: "index_pharma_pharmacy_licenses_on_status"
+  end
+
+  create_table "pharma_pharmacy_users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "pharmacy_id", null: false
+    t.string "role", default: "buyer", null: false
+    t.bigint "spree_user_id", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pharmacy_id", "spree_user_id"], name: "idx_pharma_pharmacy_users_unique_user", unique: true
+    t.index ["pharmacy_id"], name: "index_pharma_pharmacy_users_on_pharmacy_id"
+    t.index ["spree_user_id"], name: "index_pharma_pharmacy_users_on_spree_user_id"
+    t.index ["status"], name: "index_pharma_pharmacy_users_on_status"
   end
 
   create_table "pharma_supplier_fulfillments", force: :cascade do |t|
@@ -2471,6 +2540,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_104000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "pharma_admin_audit_logs", "pharma_admin_api_clients", column: "admin_api_client_id"
   add_foreign_key "pharma_drug_batch_stocks", "pharma_drug_masters", column: "drug_master_id"
   add_foreign_key "pharma_drug_batch_stocks", "pharma_supplier_offers", column: "supplier_offer_id"
   add_foreign_key "pharma_drug_batch_stocks", "pharma_supplier_warehouses", column: "supplier_warehouse_id"
@@ -2480,7 +2550,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_104000) do
   add_foreign_key "pharma_order_allocations", "pharma_supplier_offers", column: "supplier_offer_id"
   add_foreign_key "pharma_order_allocations", "pharma_supplier_warehouses", column: "supplier_warehouse_id"
   add_foreign_key "pharma_order_allocations", "pharma_suppliers", column: "supplier_id"
+  add_foreign_key "pharma_pharmacy_api_tokens", "pharma_pharmacy_users", column: "pharmacy_user_id"
   add_foreign_key "pharma_pharmacy_licenses", "pharma_pharmacies", column: "pharmacy_id"
+  add_foreign_key "pharma_pharmacy_users", "pharma_pharmacies", column: "pharmacy_id"
+  add_foreign_key "pharma_pharmacy_users", "spree_users"
   add_foreign_key "pharma_supplier_fulfillments", "pharma_supplier_warehouses", column: "supplier_warehouse_id"
   add_foreign_key "pharma_supplier_fulfillments", "pharma_suppliers", column: "supplier_id"
   add_foreign_key "pharma_supplier_licenses", "pharma_suppliers", column: "supplier_id"

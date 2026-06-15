@@ -1,0 +1,30 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">运营工作台</p>
+    <h1>业务看板</h1>
+  </div>
+</section>
+
+<section class="pharma-metrics">
+  <div>
+    <span>待审药店</span>
+    <strong><%= @pending_pharmacies_count %></strong>
+  </div>
+  <div>
+    <span>已提交订单</span>
+    <strong><%= @placed_orders_count %></strong>
+  </div>
+  <div>
+    <span>待处理履约</span>
+    <strong><%= @pending_fulfillments_count %></strong>
+  </div>
+</section>
+
+<section class="pharma-panel">
+  <p>低可用库存批号：<strong><%= @low_stock_count %></strong></p>
+  <div class="pharma-action-row">
+    <a class="pharma-secondary-button" href="/pharma/ops/pharmacies?status=pending">处理药店审核</a>
+    <a class="pharma-secondary-button" href="/pharma/ops/fulfillments?status=pending">处理履约发货</a>
+    <a class="pharma-secondary-button" href="/pharma/ops/catalog">查看货盘库存</a>
+  </div>
+</section>

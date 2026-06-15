@@ -3,6 +3,51 @@
 if Rails.env.production?
   Rails.logger.info('Skipping pharma demo seed in production')
 else
+  pharmacy = Pharma::Pharmacy.find_or_create_by!(code: 'PH-DEMO-001') do |record|
+    record.name = '九州示例药店'
+    record.contact_name = '王店长'
+    record.contact_phone = '13800000888'
+    record.province = '上海市'
+    record.city = '上海市'
+    record.district = '浦东新区'
+    record.address = '张江路 88 号'
+    record.status = 'approved'
+  end
+
+  Pharma::PharmacyLicense.find_or_create_by!(
+    pharmacy: pharmacy,
+    license_type: 'drug_business_license',
+    license_no: '沪药营-DEMO-001'
+  ) do |record|
+    record.status = 'approved'
+    record.starts_on = Date.current - 30.days
+    record.expires_on = Date.current + 1.year
+  end
+
+  buyer_email = ENV.fetch('PHARMA_DEMO_BUYER_EMAIL', 'buyer@example.com')
+  buyer_password = ENV.fetch('PHARMA_DEMO_BUYER_PASSWORD', 'buyer123')
+  buyer = Spree::User.find_or_initialize_by(email: buyer_email)
+  unless buyer.persisted? && buyer.valid_password?(buyer_password)
+    buyer.password = buyer_password
+    buyer.password_confirmation = buyer_password
+  end
+  buyer.save!
+
+  Pharma::PharmacyUser.find_or_create_by!(pharmacy: pharmacy, user: buyer) do |record|
+    record.role = 'buyer'
+    record.status = 'active'
+  end
+
+  admin_api_token = ENV.fetch('PHARMA_DEMO_ADMIN_API_TOKEN', 'dev-admin-token')
+  admin_api_client = Pharma::AdminApiClient.find_or_initialize_by(
+    token_digest: Pharma::AdminApiClient.digest(admin_api_token)
+  )
+  admin_api_client.name = '开发默认后台 API 客户端'
+  admin_api_client.token_prefix = admin_api_token.first(12)
+  admin_api_client.role = 'super_admin'
+  admin_api_client.status = 'active'
+  admin_api_client.save!
+
   supplier = Pharma::Supplier.find_or_create_by!(code: 'SUP-DEMO-001') do |record|
     record.name = '华东医药供货有限公司'
     record.contact_name = '李经理'
@@ -82,4 +127,7 @@ else
   end
 
   Pharma::SupplierVisibilityConfig.current
+
+  puts "药店买家账号：#{buyer_email} / #{buyer_password}，药店编码：#{pharmacy.code}"
+  puts "后台 API 客户端：#{admin_api_client.name}，角色：#{admin_api_client.role}，Token：#{admin_api_token}"
 end

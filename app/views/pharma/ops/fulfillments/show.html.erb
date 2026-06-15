@@ -1,0 +1,65 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">履约详情</p>
+    <h1><%= @fulfillment.fulfillment_no %></h1>
+  </div>
+</section>
+
+<section class="pharma-metrics">
+  <div>
+    <span>供应商</span>
+    <strong><%= @fulfillment.supplier.name %></strong>
+  </div>
+  <div>
+    <span>仓库</span>
+    <strong><%= @fulfillment.supplier_warehouse.name %></strong>
+  </div>
+  <div>
+    <span>状态</span>
+    <strong><%= @fulfillment.status %></strong>
+  </div>
+</section>
+
+<section class="pharma-panel">
+  <%= form_with url: "/pharma/ops/fulfillments/#{@fulfillment.id}/transition", method: :patch, class: "pharma-filter-grid" do |form| %>
+    <label>
+      操作
+      <%= form.select :event, [["开始拣货", "start_picking"], ["发货", "ship"], ["签收", "receive"], ["取消", "cancel"]] %>
+    </label>
+    <label>
+      物流公司
+      <%= form.text_field :delivery_company, value: @fulfillment.delivery_company || "顺丰速运" %>
+    </label>
+    <label>
+      物流单号
+      <%= form.text_field :delivery_tracking_no, value: @fulfillment.delivery_tracking_no %>
+    </label>
+    <%= form.submit "更新履约", class: "pharma-primary-button" %>
+  <% end %>
+</section>
+
+<section class="pharma-table-wrap">
+  <h2>分配明细</h2>
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>批号</th>
+        <th>数量</th>
+        <th>单价</th>
+        <th>状态</th>
+        <th>当前库存</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @allocations.each do |allocation| %>
+        <tr>
+          <td><%= allocation.batch_no_snapshot %></td>
+          <td><%= allocation.allocated_quantity %></td>
+          <td><%= allocation.allocated_unit_price %></td>
+          <td><%= allocation.status %></td>
+          <td>现货 <%= allocation.drug_batch_stock.quantity_on_hand %>，锁定 <%= allocation.drug_batch_stock.quantity_locked %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

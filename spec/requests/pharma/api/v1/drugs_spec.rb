@@ -105,6 +105,23 @@ RSpec.describe 'Pharma drug procurement API', type: :request do
     offer
   end
 
+  def bearer_token_for(pharmacy:, email: 'drug-token@example.com')
+    user = Spree::User.create!(
+      email: email,
+      password: 'Password123!',
+      password_confirmation: 'Password123!'
+    )
+    pharmacy_user = Pharma::PharmacyUser.create!(
+      pharmacy: pharmacy,
+      user: user,
+      role: 'buyer',
+      status: 'active'
+    )
+    _token_record, raw_token = Pharma::PharmacyApiToken.issue!(pharmacy_user: pharmacy_user)
+
+    "Bearer #{raw_token}"
+  end
+
   it 'searches active drug masters by query' do
     drug = create_drug(common_name: '阿莫西林胶囊', approval_number: '国药准字HAPI0001')
     create_drug(common_name: '布洛芬片', approval_number: '国药准字HAPI0002')
@@ -148,6 +165,30 @@ RSpec.describe 'Pharma drug procurement API', type: :request do
           'supplier_name' => nil,
           'label' => '平台优选'
         }
+      )
+    )
+  end
+
+  it 'returns purchasable offers for the authenticated pharmacy token' do
+    pharmacy = create_pharmacy
+    drug = create_drug(common_name: '阿莫西林胶囊', approval_number: '国药准字HAPI-TOKEN-0001')
+    offer = create_offer_for(drug)
+    authorization = bearer_token_for(pharmacy: pharmacy)
+
+    get "/pharma/api/v1/drugs/#{drug.id}/offers",
+        params: {
+          quantity: 10,
+          province: '上海市',
+          city: '上海市'
+        },
+        headers: { 'Authorization' => authorization }
+
+    expect(response).to have_http_status(:ok)
+    expect(json_body.fetch('data')).to contain_exactly(
+      hash_including(
+        'id' => offer.id,
+        'unit_price' => '8.5',
+        'available_quantity' => 100
       )
     )
   end

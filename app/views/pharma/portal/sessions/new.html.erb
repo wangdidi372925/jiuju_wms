@@ -1,0 +1,25 @@
+<section class="pharma-panel pharma-auth-panel">
+  <div>
+    <p class="pharma-kicker">药店端</p>
+    <h1>药店登录</h1>
+  </div>
+
+  <%= form_with url: "/pharma/portal/session", method: :post, class: "pharma-form" do |form| %>
+    <label>
+      账号邮箱
+      <%= form.email_field :email, value: params[:email] || "buyer@example.com", required: true %>
+    </label>
+
+    <label>
+      密码
+      <%= form.password_field :password, value: params[:password] || "buyer123", required: true %>
+    </label>
+
+    <label>
+      药店编码
+      <%= form.text_field :pharmacy_code, value: params[:pharmacy_code] || "PH-DEMO-001", required: true %>
+    </label>
+
+    <%= form.submit "登录采购系统", class: "pharma-primary-button" %>
+  <% end %>
+</section>

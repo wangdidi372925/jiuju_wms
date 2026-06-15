@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <title>九州药店采购</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="pharma-page">
+    <header class="pharma-topbar">
+      <a class="pharma-brand" href="/pharma/portal/drugs">九州药店采购</a>
+      <nav class="pharma-nav">
+        <a href="/pharma/portal/drugs">药品</a>
+        <a href="/pharma/portal/cart">购物车</a>
+        <a href="/pharma/portal/orders">订单</a>
+      </nav>
+      <div class="pharma-account">
+        <% if defined?(current_pharmacy) && current_pharmacy.present? %>
+          <span><%= current_pharmacy.name %></span>
+          <%= button_to "退出", "/pharma/portal/session", method: :delete, class: "pharma-link-button" %>
+        <% end %>
+      </div>
+    </header>
+
+    <main class="pharma-main">
+      <% if notice.present? %>
+        <div class="pharma-flash pharma-flash-notice"><%= notice %></div>
+      <% end %>
+      <% if alert.present? %>
+        <div class="pharma-flash pharma-flash-alert"><%= alert %></div>
+      <% end %>
+
+      <%= yield %>
+    </main>
+  </body>
+</html>

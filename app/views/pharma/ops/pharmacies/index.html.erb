@@ -1,0 +1,46 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">平台运营</p>
+    <h1>药店审核</h1>
+  </div>
+</section>
+
+<section class="pharma-panel">
+  <%= form_with url: "/pharma/ops/pharmacies", method: :get, class: "pharma-filter-grid" do |form| %>
+    <label>
+      状态
+      <%= form.select :status, [["全部", ""], ["待审", "pending"], ["已通过", "approved"], ["已拒绝", "rejected"], ["已停用", "suspended"]], selected: @status %>
+    </label>
+    <%= form.submit "筛选", class: "pharma-primary-button" %>
+  <% end %>
+</section>
+
+<section class="pharma-table-wrap">
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>药店</th>
+        <th>联系人</th>
+        <th>区域</th>
+        <th>状态</th>
+        <th>可采购</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @pharmacies.each do |pharmacy| %>
+        <tr>
+          <td>
+            <strong><%= pharmacy.name %></strong>
+            <span><%= pharmacy.code %></span>
+          </td>
+          <td><%= pharmacy.contact_name %> / <%= pharmacy.contact_phone %></td>
+          <td><%= [pharmacy.province, pharmacy.city, pharmacy.district].compact.join(" ") %></td>
+          <td><%= pharmacy.status %></td>
+          <td><%= pharmacy.purchasing_enabled? ? "是" : "否" %></td>
+          <td><a class="pharma-secondary-button" href="/pharma/ops/pharmacies/<%= pharmacy.id %>">查看</a></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

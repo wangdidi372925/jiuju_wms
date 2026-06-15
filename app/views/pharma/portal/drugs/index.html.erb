@@ -1,0 +1,73 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">采购工作台</p>
+    <h1>药品搜索</h1>
+  </div>
+  <a class="pharma-secondary-button" href="/pharma/portal/cart">查看购物车</a>
+</section>
+
+<section class="pharma-panel">
+  <%= form_with url: "/pharma/portal/drugs", method: :get, class: "pharma-filter-grid" do |form| %>
+    <label>
+      药品关键词
+      <%= form.text_field :query, value: @query, placeholder: "通用名 / 规格 / 批准文号" %>
+    </label>
+    <label>
+      数量
+      <%= form.number_field :quantity, value: @quantity, min: 1 %>
+    </label>
+    <label>
+      省份
+      <%= form.text_field :province, value: @province %>
+    </label>
+    <label>
+      城市
+      <%= form.text_field :city, value: @city %>
+    </label>
+    <%= form.submit "查询", class: "pharma-primary-button" %>
+  <% end %>
+</section>
+
+<section class="pharma-table-wrap">
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>药品</th>
+        <th>厂家</th>
+        <th>批准文号</th>
+        <th>报价</th>
+        <th>可用库存</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @drugs.each do |drug| %>
+        <% offers = @offers_by_drug_id.fetch(drug.id, []) %>
+        <% best_offer = offers.first %>
+        <tr>
+          <td>
+            <strong><%= drug.display_name %></strong>
+            <span><%= drug.specification %> / <%= drug.package_unit %></span>
+          </td>
+          <td><%= drug.manufacturer %></td>
+          <td><%= drug.approval_number %></td>
+          <td><%= best_offer&.unit_price || "暂无" %></td>
+          <td><%= best_offer&.available_quantity(min_expiry_date: Pharma::OfferMatcher::DEFAULT_MIN_EXPIRY_DAYS.days.from_now.to_date) || 0 %></td>
+          <td>
+            <% if best_offer.present? %>
+              <%= form_with url: "/pharma/portal/cart/items", method: :post, class: "pharma-inline-form" do |form| %>
+                <%= form.hidden_field :drug_master_id, value: drug.id %>
+                <%= form.hidden_field :quantity, value: @quantity %>
+                <%= form.hidden_field :province, value: @province %>
+                <%= form.hidden_field :city, value: @city %>
+                <%= form.submit "加入购物车", class: "pharma-primary-button" %>
+              <% end %>
+            <% else %>
+              <span class="pharma-muted">当前不可售</span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

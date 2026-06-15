@@ -15,6 +15,10 @@ module Pharma
              class_name: 'Pharma::PharmacyLicense',
              dependent: :destroy,
              inverse_of: :pharmacy
+    has_many :pharmacy_users,
+             class_name: 'Pharma::PharmacyUser',
+             dependent: :destroy,
+             inverse_of: :pharmacy
 
     validates :name, :code, :contact_name, :contact_phone, :province, :city, :address, presence: true
     validates :code, uniqueness: true

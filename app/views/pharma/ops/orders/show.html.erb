@@ -1,0 +1,50 @@
+<% payload = Pharma::OrderPayload.new(@order).as_json %>
+<% metadata = @order.private_metadata || {} %>
+
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">订单详情</p>
+    <h1><%= @order.number %></h1>
+  </div>
+</section>
+
+<section class="pharma-metrics">
+  <div>
+    <span>药店</span>
+    <strong><%= metadata["pharmacy_name"] %></strong>
+  </div>
+  <div>
+    <span>状态</span>
+    <strong><%= metadata["pharma_order_status"] || @order.status %></strong>
+  </div>
+  <div>
+    <span>金额</span>
+    <strong><%= @order.total %></strong>
+  </div>
+</section>
+
+<section class="pharma-table-wrap">
+  <h2>商品</h2>
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>药品</th>
+        <th>批号</th>
+        <th>数量</th>
+        <th>单价</th>
+        <th>金额</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% payload.fetch(:items).each do |item| %>
+        <tr>
+          <td><%= item.fetch(:drug_name) %></td>
+          <td><%= item.fetch(:batch_no) %></td>
+          <td><%= item.fetch(:quantity) %></td>
+          <td><%= item.fetch(:unit_price) %></td>
+          <td><%= item.fetch(:total) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

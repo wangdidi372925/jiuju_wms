@@ -15,7 +15,7 @@ module Pharma
 
         def offers
           drug = Pharma::DrugMaster.find_by!(id: params[:id], status: 'active')
-          pharmacy = Pharma::Pharmacy.find_by!(code: params[:pharmacy_code])
+          pharmacy = pharmacy_from_request!
           quantity = normalized_quantity
           province = params[:province].to_s.strip
 

@@ -17,13 +17,47 @@ Rails.application.routes.draw do
   end
 
   namespace :pharma do
+    namespace :portal do
+      root to: 'drugs#index'
+      get :login, to: 'sessions#new'
+      resource :session, only: %i[create destroy]
+      resources :drugs, only: :index
+      resource :cart, only: :show do
+        post :items, action: :add_item
+        post :checkout
+      end
+      resources :orders, only: %i[index show], param: :number do
+        patch :cancel, on: :member
+        patch :receive, on: :member
+      end
+    end
+
+    namespace :ops do
+      root to: 'dashboard#show'
+      get :login, to: 'sessions#new'
+      resource :session, only: %i[create destroy]
+      get :catalog, to: 'catalog#index'
+      resources :orders, only: %i[index show], param: :number
+      resources :pharmacies, only: %i[index show] do
+        patch :review, on: :member
+      end
+      resources :pharmacy_licenses, only: [] do
+        patch :review, on: :member
+      end
+      resources :fulfillments, only: %i[index show] do
+        patch :transition, on: :member
+      end
+    end
+
     namespace :admin do
       namespace :api do
         namespace :v1 do
+          resources :audit_logs, only: %i[index show]
           resources :drug_masters, only: %i[index show create update]
           resources :drug_batch_stocks, only: %i[create update]
           resources :inventory_imports, only: %i[show create]
           resources :order_allocations, only: :create
+          resources :orders, only: %i[index show], param: :number
           resources :pharmacies, only: %i[index show] do
             patch :review, on: :member
           end
@@ -50,6 +84,8 @@ Rails.application.routes.draw do
 
     namespace :api do
       namespace :v1 do
+        resource :session, only: %i[create destroy]
+
         resources :pharmacies, only: :create, param: :code do
           resources :licenses, only: :create, controller: :pharmacy_licenses
         end
@@ -62,6 +98,7 @@ Rails.application.routes.draw do
         resources :drugs, only: :index do
           get :offers, on: :member
         end
+        resources :orders, only: %i[index show], param: :number
       end
     end
   end

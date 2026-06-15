@@ -166,6 +166,10 @@ RSpec.describe Pharma::SupplierFulfillmentWorkflow do
     expect(fulfillment).to have_attributes(status: 'received')
     expect(fulfillment.received_at).to be_present
     expect(setup.fetch(:allocation).reload.status).to eq('fulfilled')
+    expect(setup.fetch(:stock).reload).to have_attributes(
+      quantity_on_hand: 90,
+      quantity_locked: 0
+    )
   end
 
   it 'cancels an open fulfillment, cancels allocations, and releases locked stock' do

@@ -1,0 +1,45 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">采购工作台</p>
+    <h1>购物车</h1>
+  </div>
+  <a class="pharma-secondary-button" href="/pharma/portal/drugs">继续采购</a>
+</section>
+
+<% if @cart.blank? %>
+  <section class="pharma-empty">
+    <h2>购物车为空</h2>
+    <a class="pharma-primary-button" href="/pharma/portal/drugs">去选药品</a>
+  </section>
+<% else %>
+  <% payload = Pharma::OrderPayload.new(@cart).as_json %>
+  <section class="pharma-table-wrap">
+    <table class="pharma-table">
+      <thead>
+        <tr>
+          <th>药品</th>
+          <th>批号</th>
+          <th>数量</th>
+          <th>单价</th>
+          <th>金额</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% payload.fetch(:items).each do |item| %>
+          <tr>
+            <td><strong><%= item.fetch(:drug_name) %></strong></td>
+            <td><%= item.fetch(:batch_no) %></td>
+            <td><%= item.fetch(:quantity) %></td>
+            <td><%= item.fetch(:unit_price) %></td>
+            <td><%= item.fetch(:total) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="pharma-summary-bar">
+    <span>合计：<strong><%= payload.fetch(:total) %></strong></span>
+    <%= button_to "提交订单", "/pharma/portal/cart/checkout", method: :post, class: "pharma-primary-button" %>
+  </section>
+<% end %>

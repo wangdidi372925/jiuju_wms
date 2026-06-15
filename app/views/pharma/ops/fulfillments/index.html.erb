@@ -1,0 +1,33 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">平台运营</p>
+    <h1>履约单</h1>
+  </div>
+</section>
+
+<section class="pharma-table-wrap">
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>履约单</th>
+        <th>供应商</th>
+        <th>仓库</th>
+        <th>状态</th>
+        <th>物流</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @fulfillments.each do |fulfillment| %>
+        <tr>
+          <td><%= fulfillment.fulfillment_no %></td>
+          <td><%= fulfillment.supplier.name %></td>
+          <td><%= fulfillment.supplier_warehouse.name %></td>
+          <td><%= fulfillment.status %></td>
+          <td><%= [fulfillment.delivery_company, fulfillment.delivery_tracking_no].compact.join(" / ") %></td>
+          <td><a class="pharma-secondary-button" href="/pharma/ops/fulfillments/<%= fulfillment.id %>">处理</a></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

@@ -1,0 +1,91 @@
+<% payload = Pharma::OrderPayload.new(@order).as_json %>
+<% pharma_status = (@order.private_metadata || {})["pharma_order_status"] || @order.status %>
+<% fulfillments = payload.fetch(:fulfillments) %>
+<% can_cancel = fulfillments.present? && fulfillments.none? { |fulfillment| %w[shipped received].include?(fulfillment.fetch(:status)) } && pharma_status != "canceled" %>
+<% can_receive = fulfillments.any? { |fulfillment| fulfillment.fetch(:status) == "shipped" } %>
+
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">订单详情</p>
+    <h1><%= @order.number %></h1>
+  </div>
+  <div class="pharma-action-row">
+    <% if can_cancel %>
+      <%= button_to "取消订单", "/pharma/portal/orders/#{@order.number}/cancel", method: :patch, class: "pharma-danger-button" %>
+    <% end %>
+    <% if can_receive %>
+      <%= button_to "确认收货", "/pharma/portal/orders/#{@order.number}/receive", method: :patch, class: "pharma-primary-button" %>
+    <% end %>
+  </div>
+</section>
+
+<section class="pharma-metrics">
+  <div>
+    <span>业务状态</span>
+    <strong><%= pharma_status %></strong>
+  </div>
+  <div>
+    <span>订单金额</span>
+    <strong><%= payload.fetch(:total) %></strong>
+  </div>
+  <div>
+    <span>商品数量</span>
+    <strong><%= payload.fetch(:item_count) %></strong>
+  </div>
+</section>
+
+<section class="pharma-table-wrap">
+  <h2>商品明细</h2>
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>药品</th>
+        <th>批号</th>
+        <th>效期</th>
+        <th>数量</th>
+        <th>单价</th>
+        <th>金额</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% payload.fetch(:items).each do |item| %>
+        <tr>
+          <td><strong><%= item.fetch(:drug_name) %></strong></td>
+          <td><%= item.fetch(:batch_no) %></td>
+          <td><%= item.fetch(:expiry_date) %></td>
+          <td><%= item.fetch(:quantity) %></td>
+          <td><%= item.fetch(:unit_price) %></td>
+          <td><%= item.fetch(:total) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>
+
+<section class="pharma-table-wrap">
+  <h2>履约信息</h2>
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>履约单</th>
+        <th>状态</th>
+        <th>仓库</th>
+        <th>物流</th>
+        <th>发货时间</th>
+        <th>收货时间</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% fulfillments.each do |fulfillment| %>
+        <tr>
+          <td><%= fulfillment.fetch(:fulfillment_no) %></td>
+          <td><%= fulfillment.fetch(:status) %></td>
+          <td><%= fulfillment.fetch(:warehouse_name) %></td>
+          <td><%= [fulfillment.fetch(:delivery_company), fulfillment.fetch(:delivery_tracking_no)].compact.join(" / ") %></td>
+          <td><%= fulfillment.fetch(:shipped_at) %></td>
+          <td><%= fulfillment.fetch(:received_at) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

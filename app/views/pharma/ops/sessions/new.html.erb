@@ -1,0 +1,15 @@
+<section class="pharma-panel pharma-auth-panel">
+  <div>
+    <p class="pharma-kicker">平台端</p>
+    <h1>运营登录</h1>
+  </div>
+
+  <%= form_with url: "/pharma/ops/session", method: :post, class: "pharma-form" do |form| %>
+    <label>
+      后台 Token
+      <%= form.password_field :token, value: params[:token] || "dev-admin-token", required: true %>
+    </label>
+
+    <%= form.submit "进入运营后台", class: "pharma-primary-button" %>
+  <% end %>
+</section>

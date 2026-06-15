@@ -1,0 +1,57 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">药店详情</p>
+    <h1><%= @pharmacy.name %></h1>
+  </div>
+  <div class="pharma-action-row">
+    <%= button_to "通过", "/pharma/ops/pharmacies/#{@pharmacy.id}/review", method: :patch, params: { status: "approved" }, class: "pharma-primary-button" %>
+    <%= button_to "拒绝", "/pharma/ops/pharmacies/#{@pharmacy.id}/review", method: :patch, params: { status: "rejected" }, class: "pharma-danger-button" %>
+    <%= button_to "停用", "/pharma/ops/pharmacies/#{@pharmacy.id}/review", method: :patch, params: { status: "suspended" }, class: "pharma-secondary-button" %>
+  </div>
+</section>
+
+<section class="pharma-metrics">
+  <div>
+    <span>药店编码</span>
+    <strong><%= @pharmacy.code %></strong>
+  </div>
+  <div>
+    <span>主体状态</span>
+    <strong><%= @pharmacy.status %></strong>
+  </div>
+  <div>
+    <span>可采购</span>
+    <strong><%= @pharmacy.purchasing_enabled? ? "是" : "否" %></strong>
+  </div>
+</section>
+
+<section class="pharma-table-wrap">
+  <h2>资质</h2>
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>类型</th>
+        <th>编号</th>
+        <th>有效期</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @pharmacy.pharmacy_licenses.each do |license| %>
+        <tr>
+          <td><%= license.license_type %></td>
+          <td><%= license.license_no %></td>
+          <td><%= license.starts_on %> 至 <%= license.expires_on %></td>
+          <td><%= license.status %></td>
+          <td>
+            <div class="pharma-action-row">
+              <%= button_to "通过", "/pharma/ops/pharmacy_licenses/#{license.id}/review", method: :patch, params: { status: "approved" }, class: "pharma-primary-button" %>
+              <%= button_to "拒绝", "/pharma/ops/pharmacy_licenses/#{license.id}/review", method: :patch, params: { status: "rejected" }, class: "pharma-danger-button" %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

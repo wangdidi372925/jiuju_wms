@@ -136,6 +136,23 @@ RSpec.describe 'Pharma pharmacy carts API', type: :request do
     { supplier: supplier, warehouse: warehouse, drug: drug, offer: offer, stock: stock }
   end
 
+  def bearer_token_for(pharmacy:, email: 'cart-token@example.com')
+    user = Spree::User.create!(
+      email: email,
+      password: 'Password123!',
+      password_confirmation: 'Password123!'
+    )
+    pharmacy_user = Pharma::PharmacyUser.create!(
+      pharmacy: pharmacy,
+      user: user,
+      role: 'buyer',
+      status: 'active'
+    )
+    _token_record, raw_token = Pharma::PharmacyApiToken.issue!(pharmacy_user: pharmacy_user)
+
+    "Bearer #{raw_token}"
+  end
+
   it 'creates and shows a cart for an approved pharmacy' do
     pharmacy = approved_pharmacy
 
@@ -156,6 +173,21 @@ RSpec.describe 'Pharma pharmacy carts API', type: :request do
 
     expect(response).to have_http_status(:ok)
     expect(json_body.fetch('data')).to include('number' => data.fetch('number'), 'items' => [])
+  end
+
+  it 'creates a cart for the authenticated pharmacy token' do
+    pharmacy = approved_pharmacy(code: 'PH-CART-API-TOKEN-001')
+    authorization = bearer_token_for(pharmacy: pharmacy)
+
+    post '/pharma/api/v1/carts',
+         params: { email: 'buyer-token@example.com' },
+         headers: { 'Authorization' => authorization }
+
+    expect(response).to have_http_status(:created)
+    expect(json_body.fetch('data')).to include(
+      'email' => 'buyer-token@example.com',
+      'pharmacy' => hash_including('code' => pharmacy.code, 'name' => '九州一号药店')
+    )
   end
 
   it 'returns an error when pharmacy cannot purchase' do

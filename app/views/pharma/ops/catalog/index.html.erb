@@ -1,0 +1,44 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">平台运营</p>
+    <h1>货盘库存</h1>
+  </div>
+</section>
+
+<section class="pharma-table-wrap">
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>药品</th>
+        <th>供应商</th>
+        <th>仓库</th>
+        <th>报价</th>
+        <th>可售区域</th>
+        <th>批号库存</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @offers.each do |offer| %>
+        <tr>
+          <td>
+            <strong><%= offer.drug_master.display_name %></strong>
+            <span><%= offer.drug_master.approval_number %></span>
+          </td>
+          <td><%= offer.supplier.name %></td>
+          <td><%= offer.supplier_warehouse.name %></td>
+          <td><%= offer.unit_price %> / <%= offer.status %></td>
+          <td>
+            <% offer.supplier_offer_regions.each do |region| %>
+              <span><%= [region.province, region.city].compact.join(" ") %>，<%= region.delivery_days %> 天</span>
+            <% end %>
+          </td>
+          <td>
+            <% offer.drug_batch_stocks.each do |stock| %>
+              <span><%= stock.batch_no %>：现货 <%= stock.quantity_on_hand %>，锁定 <%= stock.quantity_locked %>，可用 <%= stock.available_quantity %></span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

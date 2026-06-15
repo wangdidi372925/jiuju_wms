@@ -17,18 +17,21 @@ module Pharma
       ActiveRecord::Base.transaction do
         fulfillment.lock!
 
-        case event.to_s
-        when 'start_picking'
-          start_picking!(fulfillment)
-        when 'ship'
-          ship!(fulfillment, delivery_company: delivery_company, delivery_tracking_no: delivery_tracking_no)
-        when 'receive'
-          receive!(fulfillment)
-        when 'cancel'
-          cancel!(fulfillment)
-        else
-          raise WorkflowError.new('unsupported_event', '不支持的履约操作')
-        end
+        result = case event.to_s
+                 when 'start_picking'
+                   start_picking!(fulfillment)
+                 when 'ship'
+                   ship!(fulfillment, delivery_company: delivery_company, delivery_tracking_no: delivery_tracking_no)
+                 when 'receive'
+                   receive!(fulfillment)
+                 when 'cancel'
+                   cancel!(fulfillment)
+                 else
+                   raise WorkflowError.new('unsupported_event', '不支持的履约操作')
+                 end
+
+        sync_order_status!(fulfillment)
+        result
       end
     end
 
@@ -57,11 +60,13 @@ module Pharma
     def receive!(fulfillment)
       ensure_status!(fulfillment, allowed: ['shipped'])
 
+      allocations = related_allocations(fulfillment).where.not(status: 'canceled')
+      deduct_received_stock!(allocations)
+      allocations.update_all(status: 'fulfilled', updated_at: Time.current)
       fulfillment.update!(
         status: 'received',
         received_at: fulfillment.received_at || Time.current
       )
-      related_allocations(fulfillment).where.not(status: 'canceled').update_all(status: 'fulfilled', updated_at: Time.current)
       fulfillment
     end
 
@@ -97,6 +102,26 @@ module Pharma
           stock.update!(quantity_locked: [stock.quantity_locked - allocation.allocated_quantity, 0].max)
         end
       end
+    end
+
+    def deduct_received_stock!(allocations)
+      allocations.includes(:drug_batch_stock).find_each do |allocation|
+        stock = allocation.drug_batch_stock
+
+        stock.with_lock do
+          stock.update!(
+            quantity_locked: [stock.quantity_locked - allocation.allocated_quantity, 0].max,
+            quantity_on_hand: [stock.quantity_on_hand - allocation.allocated_quantity, 0].max
+          )
+        end
+      end
+    end
+
+    def sync_order_status!(fulfillment)
+      order = Spree::Order.find_by(id: fulfillment.spree_order_id)
+      return if order.blank?
+
+      Pharma::OrderStatusSync.new.call(order: order)
     end
   end
 end

@@ -1,0 +1,32 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">采购工作台</p>
+    <h1>我的订单</h1>
+  </div>
+  <a class="pharma-secondary-button" href="/pharma/portal/drugs">继续采购</a>
+</section>
+
+<section class="pharma-table-wrap">
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>订单号</th>
+        <th>状态</th>
+        <th>金额</th>
+        <th>提交时间</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders.each do |order| %>
+        <tr>
+          <td><%= order.number %></td>
+          <td><%= (order.private_metadata || {})["pharma_order_status"] || order.status %></td>
+          <td><%= order.total %></td>
+          <td><%= l(order.completed_at, format: :long) if order.completed_at.present? %></td>
+          <td><a class="pharma-secondary-button" href="/pharma/portal/orders/<%= order.number %>">查看</a></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

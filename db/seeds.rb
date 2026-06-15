@@ -14,13 +14,21 @@ def localize_seed_column(table, column, values)
   connection = ActiveRecord::Base.connection
   return unless connection.table_exists?(table) && connection.column_exists?(table, column)
 
+  quoted_table = connection.quote_table_name(table)
+  quoted_column = connection.quote_column_name(column)
+
   values.each do |from, to|
     updated_at = connection.column_exists?(table, :updated_at) ? ", updated_at = #{connection.quote(Time.current)}" : ''
     connection.execute <<~SQL.squish
-      UPDATE #{connection.quote_table_name(table)}
-      SET #{connection.quote_column_name(column)} = #{connection.quote(to)}
+      UPDATE #{quoted_table} AS localized_seed
+      SET #{quoted_column} = #{connection.quote(to)}
       #{updated_at}
-      WHERE #{connection.quote_column_name(column)} = #{connection.quote(from)}
+      WHERE localized_seed.#{quoted_column} = #{connection.quote(from)}
+      AND NOT EXISTS (
+        SELECT 1
+        FROM #{quoted_table} AS existing_seed
+        WHERE existing_seed.#{quoted_column} = #{connection.quote(to)}
+      )
     SQL
   end
 end
