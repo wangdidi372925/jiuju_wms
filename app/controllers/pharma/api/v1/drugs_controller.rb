@@ -95,10 +95,10 @@ module Pharma
         end
 
         def delivery_days_for(offer, province:, city:)
-          offer.supplier_offer_regions
-               .select { |region| region.available_for?(province: province, city: city) }
-               .map(&:delivery_days)
-               .min
+          offer.supplier_offer_regions.
+            select { |region| region.available_for?(province: province, city: city) }.
+            map(&:delivery_days).
+            min
         end
 
         def default_min_expiry_date

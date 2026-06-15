@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     namespace :admin do
       namespace :api do
         namespace :v1 do
+          resources :order_allocations, only: :create
           resource :supplier_visibility_config, only: %i[show update]
         end
       end
@@ -47,7 +48,7 @@ Rails.application.routes.draw do
   devise_for :users, class_name: "Spree::User"
 
   # Sidekiq Web UI
-  authenticate Spree.admin_user_class.model_name.singular_route_key.to_sym, ->(admin_user) { admin_user.spree_admin? } do
+  authenticate Spree.admin_user_class.model_name.singular_route_key.to_sym, lambda(&:spree_admin?) do
     mount Sidekiq::Web => "/sidekiq" # access it at http://localhost:3000/sidekiq
   end
 

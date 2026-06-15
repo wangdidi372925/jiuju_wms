@@ -45,7 +45,7 @@ RSpec.describe 'Pharma admin supplier visibility config API', type: :request do
           params: { mode: 'unknown' },
           headers: headers
 
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(422)
     expect(json_body).to include('error' => 'invalid_visibility_mode')
   end
 end

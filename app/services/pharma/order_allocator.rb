@@ -67,18 +67,16 @@ module Pharma
 
     def ensure_offer_allocatable!(offer)
       return if offer.status == 'approved' &&
-                offer.starts_at <= Time.current &&
-                offer.ends_at >= Time.current &&
-                offer.supplier.active_for_offers? &&
-                offer.supplier_warehouse.active?
+        offer.starts_at <= Time.current &&
+        offer.ends_at >= Time.current &&
+        offer.supplier.active_for_offers? &&
+        offer.supplier_warehouse.active?
 
       raise AllocationError.new('offer_unavailable', 'supplier offer is not available for allocation')
     end
 
     def ensure_stock_available!(stock, quantity)
-      if stock.available?(min_expiry_date: minimum_expiry_date) && stock.available_quantity >= quantity
-        return
-      end
+      return if stock.available?(min_expiry_date: minimum_expiry_date) && stock.available_quantity >= quantity
 
       raise AllocationError.new('insufficient_stock', 'stock available quantity is insufficient')
     end
