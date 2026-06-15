@@ -60,6 +60,20 @@ RSpec.describe Pharma::OfferMatcher do
     end
   end
 
+  let(:unlicensed_pharmacy) do
+    Pharma::Pharmacy.create!(
+      name: '九州二号药店',
+      code: 'PH-MATCH-002',
+      contact_name: '赵店长',
+      contact_phone: '13800000006',
+      province: '上海市',
+      city: '上海市',
+      district: '浦东新区',
+      address: '张江路 6 号',
+      status: 'approved'
+    )
+  end
+
   let(:drug) do
     Pharma::DrugMaster.create!(
       common_name: '阿莫西林胶囊',
@@ -76,9 +90,11 @@ RSpec.describe Pharma::OfferMatcher do
   it 'returns only available offers sorted by price, supplier priority, and delivery days' do
     expensive_supplier = approved_supplier(code: 'SUP-MATCH-001', priority: 1)
     cheap_supplier = approved_supplier(code: 'SUP-MATCH-002', priority: 10)
+    short_stock_supplier = approved_supplier(code: 'SUP-MATCH-003', priority: 20)
 
     expensive_warehouse = warehouse_for(expensive_supplier, 'WH-MATCH-001')
     cheap_warehouse = warehouse_for(cheap_supplier, 'WH-MATCH-002')
+    short_stock_warehouse = warehouse_for(short_stock_supplier, 'WH-MATCH-003')
 
     expensive_offer = Pharma::SupplierOffer.create!(
       supplier: expensive_supplier,
@@ -100,8 +116,18 @@ RSpec.describe Pharma::OfferMatcher do
       starts_at: 1.day.ago,
       ends_at: 30.days.from_now
     )
+    short_stock_offer = Pharma::SupplierOffer.create!(
+      supplier: short_stock_supplier,
+      drug_master: drug,
+      supplier_warehouse: short_stock_warehouse,
+      unit_price: 7.5,
+      min_order_quantity: 1,
+      status: 'approved',
+      starts_at: 1.day.ago,
+      ends_at: 30.days.from_now
+    )
 
-    [expensive_offer, cheap_offer].each_with_index do |offer, index|
+    [expensive_offer, cheap_offer, short_stock_offer].each_with_index do |offer, index|
       Pharma::SupplierOfferRegion.create!(
         supplier_offer: offer,
         province: '上海市',
@@ -116,7 +142,7 @@ RSpec.describe Pharma::OfferMatcher do
         supplier_offer: offer,
         batch_no: "BATCH-MATCH-#{index}",
         expiry_date: Date.current + 2.years,
-        quantity_on_hand: 100,
+        quantity_on_hand: offer == short_stock_offer ? 5 : 100,
         quantity_locked: 0,
         status: 'active'
       )
@@ -131,5 +157,48 @@ RSpec.describe Pharma::OfferMatcher do
     )
 
     expect(result).to eq([cheap_offer, expensive_offer])
+  end
+
+  it 'returns no offers when pharmacy is not allowed to purchase' do
+    supplier = approved_supplier(code: 'SUP-MATCH-004', priority: 10)
+    warehouse = warehouse_for(supplier, 'WH-MATCH-004')
+    offer = Pharma::SupplierOffer.create!(
+      supplier: supplier,
+      drug_master: drug,
+      supplier_warehouse: warehouse,
+      unit_price: 8.5,
+      min_order_quantity: 1,
+      status: 'approved',
+      starts_at: 1.day.ago,
+      ends_at: 30.days.from_now
+    )
+    Pharma::SupplierOfferRegion.create!(
+      supplier_offer: offer,
+      province: '上海市',
+      city: '上海市',
+      delivery_days: 1,
+      status: 'active'
+    )
+    Pharma::DrugBatchStock.create!(
+      supplier: supplier,
+      supplier_warehouse: warehouse,
+      drug_master: drug,
+      supplier_offer: offer,
+      batch_no: 'BATCH-MATCH-UNLICENSED',
+      expiry_date: Date.current + 2.years,
+      quantity_on_hand: 100,
+      quantity_locked: 0,
+      status: 'active'
+    )
+
+    result = described_class.new.call(
+      drug_master: drug,
+      pharmacy: unlicensed_pharmacy,
+      quantity: 10,
+      province: '上海市',
+      city: '上海市'
+    )
+
+    expect(result).to be_empty
   end
 end

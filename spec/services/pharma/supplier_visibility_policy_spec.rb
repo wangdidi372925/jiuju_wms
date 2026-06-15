@@ -60,4 +60,9 @@ RSpec.describe Pharma::SupplierVisibilityPolicy do
       label: '华东医药供货有限公司'
     )
   end
+
+  it 'rejects unknown visibility modes' do
+    expect { described_class.new(mode: 'unknown') }
+      .to raise_error(ArgumentError, 'unknown supplier visibility mode: unknown')
+  end
 end
