@@ -11,7 +11,7 @@ module Pharma
 
           def update
             unless Pharma::SupplierVisibilityConfig::MODES.include?(params[:mode])
-              return render_error(:unprocessable_entity, 'invalid_visibility_mode', 'mode is invalid')
+              return render_error(:unprocessable_entity, 'invalid_visibility_mode', '显示模式无效')
             end
 
             config = current_config

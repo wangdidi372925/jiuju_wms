@@ -56,7 +56,7 @@ module Pharma
           metadata = order.private_metadata || {}
           return if metadata['pharmacy_id'].to_i == pharmacy.id && metadata['pharmacy_code'].to_s == pharmacy.code
 
-          raise Pharma::PharmacyCartService::CartError.new('cart_owner_mismatch', 'cart does not belong to pharmacy')
+          raise Pharma::PharmacyCartService::CartError.new('cart_owner_mismatch', '购物车不属于该药店')
         end
 
         def cart_payload(order, allocations: [], fulfillments: [])

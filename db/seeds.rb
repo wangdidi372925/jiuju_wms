@@ -10,6 +10,15 @@
 
 Spree::Core::Engine.load_seed if defined?(Spree::Core)
 
+if defined?(Spree::Store)
+  Spree::Store.find_each do |store|
+    store.update!(
+      default_locale: 'zh-CN',
+      supported_locales: 'zh-CN,en'
+    )
+  end
+end
+
 if defined?(Spree::AdminUser) && !Rails.env.production?
   admin_email = ENV.fetch('SPREE_ADMIN_EMAIL', 'spree@example.com')
   admin_password = ENV.fetch('SPREE_ADMIN_PASSWORD', 'spree123')
@@ -24,7 +33,7 @@ if defined?(Spree::AdminUser) && !Rails.env.production?
   admin_role = Spree::Role.find_or_create_by!(name: 'admin')
   admin_user.spree_roles << admin_role unless admin_user.spree_roles.exists?(admin_role.id)
 
-  puts "Spree admin credentials: #{admin_email} / #{admin_password}"
+  puts "Spree 管理员账号：#{admin_email} / #{admin_password}"
 end
 
 load Rails.root.join('db/seeds/pharma_demo.rb')

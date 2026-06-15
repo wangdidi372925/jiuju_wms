@@ -29,7 +29,7 @@ module Pharma
     def expires_after_start
       return if starts_on.blank? || expires_on.blank?
 
-      errors.add(:expires_on, 'must be on or after starts_on') if expires_on < starts_on
+      errors.add(:expires_on, '必须晚于或等于生效日期') if expires_on < starts_on
     end
   end
 end

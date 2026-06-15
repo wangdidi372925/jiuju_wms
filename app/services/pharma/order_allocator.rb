@@ -48,7 +48,7 @@ module Pharma
 
     def normalize_quantity(quantity)
       normalized = Integer(quantity, exception: false).to_i
-      raise AllocationError.new('invalid_quantity', 'quantity must be greater than 0') unless normalized.positive?
+      raise AllocationError.new('invalid_quantity', '数量必须大于 0') unless normalized.positive?
 
       normalized
     end
@@ -56,13 +56,13 @@ module Pharma
     def ensure_line_item_belongs_to_order!(line_item, order)
       return if line_item.order_id == order.id
 
-      raise AllocationError.new('line_item_order_mismatch', 'line item must belong to order')
+      raise AllocationError.new('line_item_order_mismatch', '订单明细必须属于该订单')
     end
 
     def ensure_stock_matches_offer!(stock, offer)
       return if stock.supplier_offer_id == offer.id
 
-      raise AllocationError.new('stock_offer_mismatch', 'stock must belong to supplier offer')
+      raise AllocationError.new('stock_offer_mismatch', '库存必须属于该货盘报价')
     end
 
     def ensure_offer_allocatable!(offer)
@@ -72,13 +72,13 @@ module Pharma
         offer.supplier.active_for_offers? &&
         offer.supplier_warehouse.active?
 
-      raise AllocationError.new('offer_unavailable', 'supplier offer is not available for allocation')
+      raise AllocationError.new('offer_unavailable', '货盘报价当前不可分单')
     end
 
     def ensure_stock_available!(stock, quantity)
       return if stock.available?(min_expiry_date: minimum_expiry_date) && stock.available_quantity >= quantity
 
-      raise AllocationError.new('insufficient_stock', 'stock available quantity is insufficient')
+      raise AllocationError.new('insufficient_stock', '可用库存不足')
     end
 
     def create_allocation!(order:, line_item:, offer:, stock:, quantity:)

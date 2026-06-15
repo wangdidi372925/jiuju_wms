@@ -21,7 +21,7 @@ module Pharma
           end
 
           def review
-            return render_error(:unprocessable_entity, 'invalid_status', 'status is invalid') unless REVIEW_STATUSES.include?(params[:status])
+            return render_error(:unprocessable_entity, 'invalid_status', '状态无效') unless REVIEW_STATUSES.include?(params[:status])
 
             pharmacy = Pharma::Pharmacy.find(params[:id])
             pharmacy.update!(status: params[:status])

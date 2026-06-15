@@ -158,8 +158,8 @@ RSpec.describe 'Pharma fulfillment models', type: :model do
     )
 
     expect(allocation).not_to be_valid
-    expect(allocation.errors[:supplier]).to include('must match drug_batch_stock')
-    expect(allocation.errors[:supplier_warehouse]).to include('must match drug_batch_stock')
+    expect(allocation.errors[:supplier]).to include('必须与批号库存一致')
+    expect(allocation.errors[:supplier_warehouse]).to include('必须与批号库存一致')
   end
 
   it 'requires allocation line item to belong to the allocation order' do
@@ -183,7 +183,7 @@ RSpec.describe 'Pharma fulfillment models', type: :model do
     )
 
     expect(allocation).not_to be_valid
-    expect(allocation.errors[:spree_line_item]).to include('must belong to spree_order')
+    expect(allocation.errors[:spree_line_item]).to include('必须属于该订单')
   end
 
   it 'requires fulfillment warehouse to belong to the fulfillment supplier' do
@@ -201,7 +201,7 @@ RSpec.describe 'Pharma fulfillment models', type: :model do
     )
 
     expect(fulfillment).not_to be_valid
-    expect(fulfillment.errors[:supplier_warehouse]).to include('must belong to supplier')
+    expect(fulfillment.errors[:supplier_warehouse]).to include('必须属于该货盘方')
   end
 
   it 'requires fulfillment order to exist' do
@@ -217,6 +217,6 @@ RSpec.describe 'Pharma fulfillment models', type: :model do
     )
 
     expect(fulfillment).not_to be_valid
-    expect(fulfillment.errors[:spree_order]).to include('must exist')
+    expect(fulfillment.errors[:spree_order]).to include('不存在')
   end
 end

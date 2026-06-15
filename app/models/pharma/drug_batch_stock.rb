@@ -35,15 +35,15 @@ module Pharma
     def locked_not_greater_than_on_hand
       return if quantity_on_hand.blank? || quantity_locked.blank?
 
-      errors.add(:quantity_locked, 'cannot exceed quantity_on_hand') if quantity_locked > quantity_on_hand
+      errors.add(:quantity_locked, '不能超过库存数量') if quantity_locked > quantity_on_hand
     end
 
     def matches_supplier_offer
       return if supplier_offer.blank?
 
-      errors.add(:supplier, 'must match supplier_offer') if supplier_id != supplier_offer.supplier_id
-      errors.add(:supplier_warehouse, 'must match supplier_offer') if supplier_warehouse_id != supplier_offer.supplier_warehouse_id
-      errors.add(:drug_master, 'must match supplier_offer') if drug_master_id != supplier_offer.drug_master_id
+      errors.add(:supplier, '必须与货盘报价一致') if supplier_id != supplier_offer.supplier_id
+      errors.add(:supplier_warehouse, '必须与货盘报价一致') if supplier_warehouse_id != supplier_offer.supplier_warehouse_id
+      errors.add(:drug_master, '必须与货盘报价一致') if drug_master_id != supplier_offer.drug_master_id
     end
   end
 end

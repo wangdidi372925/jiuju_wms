@@ -18,13 +18,14 @@ module Pharma
     def create_cart(pharmacy_code:, email: nil)
       pharmacy = purchasable_pharmacy!(pharmacy_code)
       store = Spree::Store.default
+      locale = ensure_store_locale!(store)
 
       Spree::Order.create!(
         number: next_order_number,
         email: email.presence || "pharmacy-#{pharmacy.id}@pharma.local",
         store: store,
         currency: store.default_currency,
-        locale: store.default_locale,
+        locale: locale,
         state: 'cart',
         status: 'draft',
         private_metadata: pharmacy_metadata(pharmacy)
@@ -39,8 +40,8 @@ module Pharma
       province = params.fetch(:province)
       city = params[:city]
       normalized_quantity = normalize_quantity(quantity)
-      raise CartError.new('invalid_quantity', 'quantity must be greater than 0') unless normalized_quantity.positive?
-      raise CartError.new('missing_province', 'province is required') if province.blank?
+      raise CartError.new('invalid_quantity', '数量必须大于 0') unless normalized_quantity.positive?
+      raise CartError.new('missing_province', '省份不能为空') if province.blank?
 
       pharmacy = purchasable_pharmacy!(pharmacy_code)
       order = open_cart!(order_number, pharmacy)
@@ -78,7 +79,7 @@ module Pharma
       ActiveRecord::Base.transaction do
         order.lock!
         line_items = order.line_items.reload.to_a
-        raise CartError.new('empty_cart', 'cart must contain at least one item') if line_items.empty?
+        raise CartError.new('empty_cart', '购物车至少需要包含一个商品') if line_items.empty?
 
         allocations = []
         fulfillments = []
@@ -106,13 +107,13 @@ module Pharma
       pharmacy = Pharma::Pharmacy.find_by!(code: code)
       return pharmacy if pharmacy.purchasing_enabled?
 
-      raise CartError.new('pharmacy_not_allowed', 'pharmacy is not allowed to purchase')
+      raise CartError.new('pharmacy_not_allowed', '药店当前不允许采购')
     end
 
     def open_cart!(order_number, pharmacy)
       order = Spree::Order.find_by!(number: order_number)
-      raise CartError.new('cart_owner_mismatch', 'cart does not belong to pharmacy') unless cart_belongs_to?(order, pharmacy)
-      raise CartError.new('cart_not_open', 'cart has already been submitted') if order.completed_at.present? || order.status == 'placed'
+      raise CartError.new('cart_owner_mismatch', '购物车不属于该药店') unless cart_belongs_to?(order, pharmacy)
+      raise CartError.new('cart_not_open', '购物车已提交，不能继续修改') if order.completed_at.present? || order.status == 'placed'
 
       order
     end
@@ -133,7 +134,7 @@ module Pharma
       ).first
       return offer if offer.present?
 
-      raise CartError.new('offer_unavailable', 'no available offer for the requested drug and quantity')
+      raise CartError.new('offer_unavailable', '当前药品和数量没有可用货盘')
     end
 
     def best_stock_for(offer, quantity:)
@@ -142,7 +143,7 @@ module Pharma
               max_by(&:expiry_date)
       return stock if stock.present?
 
-      raise CartError.new('offer_unavailable', 'no single batch has enough available stock')
+      raise CartError.new('offer_unavailable', '没有单个批号库存可以满足本次采购数量')
     end
 
     def create_line_item!(context)
@@ -200,14 +201,27 @@ module Pharma
     end
 
     def default_shipping_category
-      Spree::ShippingCategory.first || Spree::ShippingCategory.create!(name: 'Pharma Default')
+      Spree::ShippingCategory.first || Spree::ShippingCategory.create!(name: '药品默认配送分类')
+    end
+
+    def ensure_store_locale!(store)
+      locale = I18n.locale.to_s
+      supported_locales = store.supported_locales.to_s.split(',').map(&:strip).reject(&:blank?)
+      return locale if store.default_locale == locale && supported_locales.include?(locale)
+
+      store.update_columns(
+        default_locale: locale,
+        supported_locales: (supported_locales + [locale, 'en']).uniq.join(','),
+        updated_at: Time.current
+      )
+      locale
     end
 
     def allocate_line_item!(order, line_item)
       metadata = line_item.private_metadata || {}
       supplier_offer_id = metadata['supplier_offer_id']
       stock_id = metadata['drug_batch_stock_id']
-      raise CartError.new('cart_item_invalid', 'cart item is missing allocation metadata') if supplier_offer_id.blank? || stock_id.blank?
+      raise CartError.new('cart_item_invalid', '购物车商品缺少分单所需信息') if supplier_offer_id.blank? || stock_id.blank?
 
       Pharma::OrderAllocator.new.call(
         spree_order_id: order.id,

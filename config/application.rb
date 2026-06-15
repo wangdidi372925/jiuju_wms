@@ -36,6 +36,11 @@ module SpreeStarter
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Use Simplified Chinese as the default language for Spree Admin, APIs, and Rails validations.
+    config.i18n.available_locales = [:'zh-CN', :en]
+    config.i18n.default_locale = :'zh-CN'
+    config.i18n.fallbacks = [:en]
+
     # Don't generate system test files.
     config.generators.system_tests = nil
 

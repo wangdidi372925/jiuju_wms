@@ -5,7 +5,7 @@ module Pharma
     VALID_MODES = %w[hidden partial visible].freeze
 
     def initialize(mode:)
-      raise ArgumentError, "unknown supplier visibility mode: #{mode}" unless VALID_MODES.include?(mode)
+      raise ArgumentError, "未知的货盘方显示模式：#{mode}" unless VALID_MODES.include?(mode)
 
       @mode = mode
     end

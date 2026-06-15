@@ -14,7 +14,7 @@ module Pharma
         end
 
         def render_not_found
-          render_error(:not_found, 'not_found', 'record not found')
+          render_error(:not_found, 'not_found', '记录不存在')
         end
 
         def render_record_invalid(error)

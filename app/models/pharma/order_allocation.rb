@@ -32,25 +32,25 @@ module Pharma
     def matches_drug_batch_stock
       return if drug_batch_stock.blank?
 
-      errors.add(:supplier, 'must match drug_batch_stock') if supplier_id != drug_batch_stock.supplier_id
-      errors.add(:supplier_warehouse, 'must match drug_batch_stock') if supplier_warehouse_id != drug_batch_stock.supplier_warehouse_id
-      errors.add(:supplier_offer, 'must match drug_batch_stock') if supplier_offer_id != drug_batch_stock.supplier_offer_id
+      errors.add(:supplier, '必须与批号库存一致') if supplier_id != drug_batch_stock.supplier_id
+      errors.add(:supplier_warehouse, '必须与批号库存一致') if supplier_warehouse_id != drug_batch_stock.supplier_warehouse_id
+      errors.add(:supplier_offer, '必须与批号库存一致') if supplier_offer_id != drug_batch_stock.supplier_offer_id
     end
 
     def spree_line_item_belongs_to_order
       return if spree_order_id.blank? || spree_line_item_id.blank?
 
       if spree_order.blank?
-        errors.add(:spree_order, 'must exist')
+        errors.add(:spree_order, '不存在')
         return
       end
 
       if spree_line_item.blank?
-        errors.add(:spree_line_item, 'must exist')
+        errors.add(:spree_line_item, '不存在')
         return
       end
 
-      errors.add(:spree_line_item, 'must belong to spree_order') if spree_line_item.order_id != spree_order_id
+      errors.add(:spree_line_item, '必须属于该订单') if spree_line_item.order_id != spree_order_id
     end
   end
 end

@@ -15,7 +15,7 @@ module Pharma
           def authenticate_admin_token!
             return if valid_admin_token?
 
-            render_error(:unauthorized, 'unauthorized', 'invalid admin api token')
+            render_error(:unauthorized, 'unauthorized', '管理员接口令牌无效')
           end
 
           def valid_admin_token?
@@ -34,7 +34,7 @@ module Pharma
           end
 
           def render_not_found
-            render_error(:not_found, 'not_found', 'record not found')
+            render_error(:not_found, 'not_found', '记录不存在')
           end
 
           def render_record_invalid(error)

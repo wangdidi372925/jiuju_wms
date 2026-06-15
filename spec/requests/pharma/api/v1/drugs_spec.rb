@@ -165,4 +165,22 @@ RSpec.describe 'Pharma drug procurement API', type: :request do
     expect(response).to have_http_status(:not_found)
     expect(json_body).to include('error' => 'not_found')
   end
+
+  it 'returns Chinese validation messages for invalid offer requests' do
+    pharmacy = create_pharmacy
+    drug = create_drug(common_name: '阿莫西林胶囊', approval_number: '国药准字HAPI0006')
+
+    get "/pharma/api/v1/drugs/#{drug.id}/offers",
+        params: {
+          pharmacy_code: pharmacy.code,
+          quantity: 0,
+          province: '上海市'
+        }
+
+    expect(response).to have_http_status(422)
+    expect(json_body).to include(
+      'error' => 'invalid_quantity',
+      'message' => '数量必须大于 0'
+    )
+  end
 end

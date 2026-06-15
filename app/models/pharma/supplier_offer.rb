@@ -66,13 +66,13 @@ module Pharma
     def ends_after_start
       return if starts_at.blank? || ends_at.blank?
 
-      errors.add(:ends_at, 'must be after starts_at') if ends_at <= starts_at
+      errors.add(:ends_at, '必须晚于报价开始时间') if ends_at <= starts_at
     end
 
     def warehouse_belongs_to_supplier
       return if supplier.blank? || supplier_warehouse.blank?
 
-      errors.add(:supplier_warehouse, 'must belong to supplier') if supplier_warehouse.supplier_id != supplier.id
+      errors.add(:supplier_warehouse, '必须属于该货盘方') if supplier_warehouse.supplier_id != supplier.id
     end
   end
 end

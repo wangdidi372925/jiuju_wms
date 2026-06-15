@@ -139,6 +139,7 @@ RSpec.describe Pharma::PharmacyCartService do
 
     expect(order).to have_attributes(
       email: 'buyer@example.com',
+      locale: 'zh-CN',
       state: 'cart',
       status: 'draft',
       item_count: 0

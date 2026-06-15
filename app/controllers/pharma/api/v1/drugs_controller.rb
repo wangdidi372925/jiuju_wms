@@ -19,11 +19,9 @@ module Pharma
           quantity = normalized_quantity
           province = params[:province].to_s.strip
 
-          return render_error(:unprocessable_entity, 'invalid_quantity', 'quantity must be greater than 0') unless quantity.positive?
-          return render_error(:unprocessable_entity, 'missing_province', 'province is required') if province.blank?
-          unless pharmacy.purchasing_enabled?
-            return render_error(:unprocessable_entity, 'pharmacy_not_allowed', 'pharmacy is not allowed to purchase')
-          end
+          return render_error(:unprocessable_entity, 'invalid_quantity', '数量必须大于 0') unless quantity.positive?
+          return render_error(:unprocessable_entity, 'missing_province', '省份不能为空') if province.blank?
+          return render_error(:unprocessable_entity, 'pharmacy_not_allowed', '药店当前不允许采购') unless pharmacy.purchasing_enabled?
 
           matcher = Pharma::OfferMatcher.new
           offers = matcher.call(

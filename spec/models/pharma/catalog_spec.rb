@@ -135,7 +135,7 @@ RSpec.describe 'Pharma catalog models', type: :model do
     )
 
     expect(offer).not_to be_valid
-    expect(offer.errors[:supplier_warehouse]).to include('must belong to supplier')
+    expect(offer.errors[:supplier_warehouse]).to include('必须属于该货盘方')
   end
 
   it 'requires batch stock supplier, warehouse, and drug to match the offer' do
@@ -165,7 +165,7 @@ RSpec.describe 'Pharma catalog models', type: :model do
     )
 
     expect(stock).not_to be_valid
-    expect(stock.errors[:supplier]).to include('must match supplier_offer')
-    expect(stock.errors[:supplier_warehouse]).to include('must match supplier_offer')
+    expect(stock.errors[:supplier]).to include('必须与货盘报价一致')
+    expect(stock.errors[:supplier_warehouse]).to include('必须与货盘报价一致')
   end
 end

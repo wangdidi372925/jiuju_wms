@@ -27,13 +27,13 @@ module Pharma
     def warehouse_belongs_to_supplier
       return if supplier.blank? || supplier_warehouse.blank?
 
-      errors.add(:supplier_warehouse, 'must belong to supplier') if supplier_warehouse.supplier_id != supplier.id
+      errors.add(:supplier_warehouse, '必须属于该货盘方') if supplier_warehouse.supplier_id != supplier.id
     end
 
     def spree_order_exists
       return if spree_order_id.blank?
 
-      errors.add(:spree_order, 'must exist') if spree_order.blank?
+      errors.add(:spree_order, '不存在') if spree_order.blank?
     end
   end
 end

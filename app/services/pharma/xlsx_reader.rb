@@ -17,7 +17,7 @@ module Pharma
     def rows
       Zip::File.open(file_path) do |zip|
         sheet_entry = zip.find_entry(SHEET_ENTRY)
-        raise ParseError, 'worksheet sheet1.xml not found' if sheet_entry.blank?
+        raise ParseError, '未找到第一个工作表 sheet1.xml' if sheet_entry.blank?
 
         parse_sheet(sheet_entry.get_input_stream.read, shared_strings(zip))
       end

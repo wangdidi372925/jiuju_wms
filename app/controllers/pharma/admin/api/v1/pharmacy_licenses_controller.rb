@@ -8,7 +8,7 @@ module Pharma
           REVIEW_STATUSES = %w[approved rejected expired].freeze
 
           def review
-            return render_error(:unprocessable_entity, 'invalid_status', 'status is invalid') unless REVIEW_STATUSES.include?(params[:status])
+            return render_error(:unprocessable_entity, 'invalid_status', '状态无效') unless REVIEW_STATUSES.include?(params[:status])
 
             license = Pharma::PharmacyLicense.find(params[:id])
             license.update!(status: params[:status])

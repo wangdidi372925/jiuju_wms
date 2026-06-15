@@ -6,8 +6,8 @@ module Pharma
       module V1
         class InventoryImportsController < BaseController
           def create
-            return render_error(:unprocessable_entity, 'missing_file', 'inventory xlsx file is required') if uploaded_file.blank?
-            return render_error(:unprocessable_entity, 'unsupported_file', 'only .xlsx files are supported') unless xlsx_upload?
+            return render_error(:unprocessable_entity, 'missing_file', '请上传货盘 Excel 文件') if uploaded_file.blank?
+            return render_error(:unprocessable_entity, 'unsupported_file', '仅支持 .xlsx 文件') unless xlsx_upload?
 
             import = Pharma::InventoryImportProcessor.new.call(
               file: uploaded_file,

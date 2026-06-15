@@ -27,7 +27,7 @@ module Pharma
         when 'cancel'
           cancel!(fulfillment)
         else
-          raise WorkflowError.new('unsupported_event', 'unsupported fulfillment event')
+          raise WorkflowError.new('unsupported_event', '不支持的履约操作')
         end
       end
     end
@@ -78,7 +78,7 @@ module Pharma
     def ensure_status!(fulfillment, allowed:)
       return if allowed.include?(fulfillment.status)
 
-      raise WorkflowError.new('invalid_transition', "cannot transition fulfillment from #{fulfillment.status}")
+      raise WorkflowError.new('invalid_transition', "当前履约状态（#{fulfillment.status}）不允许执行该操作")
     end
 
     def related_allocations(fulfillment)
