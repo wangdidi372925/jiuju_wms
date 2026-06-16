@@ -38,23 +38,34 @@
 - Meilisearch：http://localhost:7700
 - PostgreSQL host 端口：`localhost:5433`
 
-开发环境默认后台账号：
+### 3.1 测试账号速查
 
-- 邮箱：`spree@example.com`
-- 密码：`spree123`
+以下账号由开发种子数据创建或输出，仅用于本地开发、测试和演示：
 
-开发环境默认药店买家账号：
+| 场景 | 入口 | 账号/凭证 | 密码/补充 | 说明 |
+| --- | --- | --- | --- | --- |
+| Spree Admin | http://localhost:3000/admin | `spree@example.com` | `spree123` | Spree 原生后台管理员 |
+| 药店采购端 | http://localhost:3000/pharma/portal/login | `buyer@example.com` | 密码 `buyer123`，药店编码 `PH-DEMO-001` | 可搜索药品、加购、提交订单、确认收货 |
+| 平台运营端 | http://localhost:3000/pharma/ops/login | `dev-admin-token` | 无密码，输入 Token 登录 | 可审核药店、维护货盘、查看订单和履约 |
+| 后台 Admin API | `/pharma/admin/api/v1/*` | Header：`X-Pharma-Admin-Token: dev-admin-token` | 默认角色 `super_admin` | 用于接口联调和自动化测试 |
 
-- 邮箱：`buyer@example.com`
-- 密码：`buyer123`
-- 药店编码：`PH-DEMO-001`
+种子数据会同时创建演示药店、货盘方、仓库、药品、报价、可售区域和批号库存：
 
-Admin API 开发环境默认 token：
+- 药店：`PH-DEMO-001`，名称 `九州示例药店`，状态 approved。
+- 货盘方：`SUP-DEMO-001`，名称 `华东医药供货有限公司`。
+- 仓库：`WH-DEMO-001`，名称 `上海中心仓`。
+- 药品：`阿莫西林胶囊`，批准文号 `国药准字H00000001`。
+- 批号：`DEMO-BATCH-001`。
 
-- Header：`X-Pharma-Admin-Token: dev-admin-token`
-- 运营页面登录 Token：`dev-admin-token`
-- 默认角色：`super_admin`
-- 生产环境应设置 `PHARMA_ADMIN_API_TOKEN`，不要使用默认值。
+可通过环境变量覆盖部分测试凭证：
+
+```bash
+PHARMA_DEMO_BUYER_EMAIL=buyer@example.com
+PHARMA_DEMO_BUYER_PASSWORD=buyer123
+PHARMA_DEMO_ADMIN_API_TOKEN=dev-admin-token
+```
+
+生产环境不要使用上述默认账号和 token；后台 API 应设置独立的 `PHARMA_ADMIN_API_TOKEN` 或通过 `Pharma::AdminApiClient.issue!` 签发数据库 token。
 
 ## 4. 安装与启动
 
