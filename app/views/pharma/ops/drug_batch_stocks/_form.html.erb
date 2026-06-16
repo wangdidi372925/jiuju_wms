@@ -1,0 +1,28 @@
+<%= render "pharma/ops/shared/errors", resource: stock %>
+
+<%= form_with model: stock, url: stock.persisted? ? "/pharma/ops/drug_batch_stocks/#{stock.id}" : "/pharma/ops/supplier_offers/#{offer.id}/batch_stocks", method: stock.persisted? ? :patch : :post, class: "pharma-form pharma-form-grid" do |form| %>
+  <label>
+    批号
+    <%= form.text_field :batch_no, required: true %>
+  </label>
+  <label>
+    效期
+    <%= form.date_field :expiry_date, required: true %>
+  </label>
+  <label>
+    库存数量
+    <%= form.number_field :quantity_on_hand, required: true, min: 0, step: 1 %>
+  </label>
+  <label>
+    锁定数量
+    <%= form.number_field :quantity_locked, required: true, min: 0, step: 1 %>
+  </label>
+  <label>
+    状态
+    <%= form.select :status, Pharma::DrugBatchStock::STATUSES.map { |status| [status, status] } %>
+  </label>
+  <div class="pharma-form-actions">
+    <%= form.submit "保存批号库存", class: "pharma-primary-button" %>
+    <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers/<%= offer.id %>">返回报价</a>
+  </div>
+<% end %>

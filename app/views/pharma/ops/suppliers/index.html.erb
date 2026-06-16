@@ -1,0 +1,59 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">货盘管理</p>
+    <h1>货盘方</h1>
+  </div>
+  <a class="pharma-primary-button" href="/pharma/ops/suppliers/new">新增货盘方</a>
+</section>
+
+<nav class="pharma-subnav">
+  <a class="pharma-secondary-button" href="/pharma/ops/catalog">货盘总览</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/drug_masters">药品主数据</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers">报价</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/inventory_imports">Excel 导入</a>
+</nav>
+
+<section class="pharma-panel">
+  <%= form_with url: "/pharma/ops/suppliers", method: :get, class: "pharma-filter-grid" do |form| %>
+    <label>
+      状态
+      <%= form.select :status, [["全部", ""]] + Pharma::Supplier::STATUSES.map { |status| [status, status] }, selected: @status %>
+    </label>
+    <%= form.submit "筛选", class: "pharma-primary-button" %>
+  <% end %>
+</section>
+
+<section class="pharma-table-wrap">
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>货盘方</th>
+        <th>联系人</th>
+        <th>区域</th>
+        <th>状态</th>
+        <th>优先级</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @suppliers.each do |supplier| %>
+        <tr>
+          <td><strong><%= supplier.name %></strong><span><%= supplier.code %></span></td>
+          <td><%= supplier.contact_name %> / <%= supplier.contact_phone %></td>
+          <td><%= [supplier.province, supplier.city].join(" ") %></td>
+          <td><%= supplier.status %></td>
+          <td><%= supplier.priority %></td>
+          <td>
+            <div class="pharma-action-row">
+              <a class="pharma-secondary-button" href="/pharma/ops/suppliers/<%= supplier.id %>">详情</a>
+              <a class="pharma-secondary-button" href="/pharma/ops/suppliers/<%= supplier.id %>/edit">编辑</a>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @suppliers.blank? %>
+    <div class="pharma-empty-state">暂无货盘方</div>
+  <% end %>
+</section>

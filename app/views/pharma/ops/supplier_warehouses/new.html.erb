@@ -1,0 +1,11 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">货盘方仓库</p>
+    <h1>新增仓库</h1>
+  </div>
+</section>
+
+<section class="pharma-panel">
+  <p class="pharma-kicker"><%= @supplier.name %> / <%= @supplier.code %></p>
+  <%= render "form", supplier: @supplier, warehouse: @warehouse %>
+</section>

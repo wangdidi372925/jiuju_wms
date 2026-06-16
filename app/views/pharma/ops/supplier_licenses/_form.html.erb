@@ -1,0 +1,28 @@
+<%= render "pharma/ops/shared/errors", resource: license %>
+
+<%= form_with model: license, url: license.persisted? ? "/pharma/ops/supplier_licenses/#{license.id}" : "/pharma/ops/suppliers/#{supplier.id}/licenses", method: license.persisted? ? :patch : :post, class: "pharma-form pharma-form-grid" do |form| %>
+  <label>
+    资质类型
+    <%= form.text_field :license_type, required: true, placeholder: "drug_wholesale_license" %>
+  </label>
+  <label>
+    资质编号
+    <%= form.text_field :license_no, required: true %>
+  </label>
+  <label>
+    生效日期
+    <%= form.date_field :starts_on, required: true %>
+  </label>
+  <label>
+    到期日期
+    <%= form.date_field :expires_on, required: true %>
+  </label>
+  <label>
+    状态
+    <%= form.select :status, Pharma::SupplierLicense::STATUSES.map { |status| [status, status] } %>
+  </label>
+  <div class="pharma-form-actions">
+    <%= form.submit "保存资质", class: "pharma-primary-button" %>
+    <a class="pharma-secondary-button" href="/pharma/ops/suppliers/<%= supplier.id %>">返回货盘方</a>
+  </div>
+<% end %>

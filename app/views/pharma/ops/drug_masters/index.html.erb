@@ -1,0 +1,54 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">货盘管理</p>
+    <h1>药品主数据</h1>
+  </div>
+  <a class="pharma-primary-button" href="/pharma/ops/drug_masters/new">新增药品</a>
+</section>
+
+<nav class="pharma-subnav">
+  <a class="pharma-secondary-button" href="/pharma/ops/catalog">货盘总览</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/suppliers">货盘方</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers">报价</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/inventory_imports">Excel 导入</a>
+</nav>
+
+<section class="pharma-panel">
+  <%= form_with url: "/pharma/ops/drug_masters", method: :get, class: "pharma-filter-grid" do |form| %>
+    <label>
+      搜索药品
+      <%= form.text_field :query, value: @query, placeholder: "通用名 / 规格 / 厂家 / 批准文号" %>
+    </label>
+    <%= form.submit "搜索", class: "pharma-primary-button" %>
+  <% end %>
+</section>
+
+<section class="pharma-table-wrap">
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>药品</th>
+        <th>批准文号</th>
+        <th>储存</th>
+        <th>处方</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @drugs.each do |drug| %>
+        <tr>
+          <td><strong><%= drug.common_name %></strong><span><%= drug.specification %> / <%= drug.manufacturer %></span></td>
+          <td><%= drug.approval_number %></td>
+          <td><%= drug.storage_condition %> / <%= drug.temperature_control %></td>
+          <td><%= drug.prescription_required? ? "是" : "否" %></td>
+          <td><%= drug.status %></td>
+          <td><a class="pharma-secondary-button" href="/pharma/ops/drug_masters/<%= drug.id %>/edit">编辑</a></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @drugs.blank? %>
+    <div class="pharma-empty-state">暂无药品主数据</div>
+  <% end %>
+</section>

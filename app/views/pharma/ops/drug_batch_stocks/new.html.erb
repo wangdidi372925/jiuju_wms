@@ -1,0 +1,11 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">批号库存</p>
+    <h1>新增批号库存</h1>
+  </div>
+</section>
+
+<section class="pharma-panel">
+  <p class="pharma-kicker"><%= @offer.drug_master.common_name %> / <%= @offer.supplier.name %> / <%= @offer.supplier_warehouse.name %></p>
+  <%= render "form", offer: @offer, stock: @stock %>
+</section>

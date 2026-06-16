@@ -1,0 +1,71 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">货盘方详情</p>
+    <h1><%= @supplier.name %></h1>
+  </div>
+  <div class="pharma-action-row">
+    <a class="pharma-secondary-button" href="/pharma/ops/suppliers/<%= @supplier.id %>/edit">编辑货盘方</a>
+    <a class="pharma-primary-button" href="/pharma/ops/suppliers/<%= @supplier.id %>/licenses/new">新增资质</a>
+    <a class="pharma-primary-button" href="/pharma/ops/suppliers/<%= @supplier.id %>/warehouses/new">新增仓库</a>
+  </div>
+</section>
+
+<section class="pharma-metrics">
+  <div><span>编码</span><strong><%= @supplier.code %></strong></div>
+  <div><span>状态</span><strong><%= @supplier.status %></strong></div>
+  <div><span>可供货</span><strong><%= @supplier.active_for_offers? ? "是" : "否" %></strong></div>
+</section>
+
+<section class="pharma-table-wrap">
+  <h2>资质</h2>
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>类型</th>
+        <th>编号</th>
+        <th>有效期</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @supplier.supplier_licenses.each do |license| %>
+        <tr>
+          <td><%= license.license_type %></td>
+          <td><%= license.license_no %></td>
+          <td><%= license.starts_on %> 至 <%= license.expires_on %></td>
+          <td><%= license.status %></td>
+          <td><a class="pharma-secondary-button" href="/pharma/ops/supplier_licenses/<%= license.id %>/edit">编辑</a></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>
+
+<section class="pharma-table-wrap">
+  <h2>仓库</h2>
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>仓库</th>
+        <th>区域</th>
+        <th>地址</th>
+        <th>冷链</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @supplier.supplier_warehouses.each do |warehouse| %>
+        <tr>
+          <td><strong><%= warehouse.name %></strong><span><%= warehouse.code %></span></td>
+          <td><%= warehouse.region_label %></td>
+          <td><%= warehouse.address %></td>
+          <td><%= warehouse.cold_chain_enabled? ? "是" : "否" %></td>
+          <td><%= warehouse.status %></td>
+          <td><a class="pharma-secondary-button" href="/pharma/ops/supplier_warehouses/<%= warehouse.id %>/edit">编辑</a></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

@@ -1,8 +1,8 @@
 # 九州医药 B2B 订货系统项目交接文档
 
-更新时间：2026-06-15  
-当前分支：`feature/spree-pharma-foundation`  
-当前提交：`c7fe20c feat: add pharmacy cart api`
+更新时间：2026-06-16  
+当前分支：`main`  
+当前提交：`75cc34c`
 
 ## 1. 项目定位
 
@@ -12,7 +12,7 @@
 
 - Spree 负责通用电商底座：`Order`、`LineItem`、`Product`、`Variant`、Admin、Store API 等。
 - 医药 B2B 领域能力放在 `Pharma` 命名空间下，避免把药品资质、批号效期、货盘、区域可售、履约规则硬塞进 Spree 原模型。
-- 当前主要是 API 和后端领域能力，尚未做完整业务前端页面。
+- 当前已经有药店采购端和平台运营端的轻量业务页面，运营端已具备货盘方、药品、报价、库存和 Excel 导入维护入口。
 
 ## 2. 技术栈
 
@@ -138,10 +138,11 @@ docker compose -f docker-compose.dev.yml down
 最近一次验证结果：
 
 ```text
-RSpec: 112 examples, 0 failures
-RuboCop: 95 files inspected, no offenses detected
+RSpec: 115 examples, 0 failures
+RuboCop: 100 files inspected, no offenses detected
 Seed: db:seed 可重复执行，输出后台账号和药店买家账号
 Health: /up 返回 200
+Browser smoke: `/pharma/ops/catalog`、`/suppliers`、`/drug_masters`、`/supplier_offers`、`/inventory_imports/new` 正常渲染，控制台无 error
 ```
 
 测试中会看到一些 Spree 自身的 deprecation warning，例如 `Product#available_on=`、`DefaultPrice`、`public_metadata`。当前不影响测试通过，但后续升级 Spree 6 前需要处理。
@@ -184,7 +185,7 @@ Health: /up 返回 200
 
 ### 6.3 药品、供应商、报价、库存后台维护
 
-已实现后台 API：
+已实现后台 API 和运营端页面：
 
 - 药品主数据 CRUD。
 - 供应商 CRUD。
@@ -193,6 +194,11 @@ Health: /up 返回 200
 - 供应商报价创建/更新。
 - 报价可售区域创建/更新。
 - 批号效期库存创建/更新。
+- 运营页面入口：
+  - `/pharma/ops/suppliers`：货盘方列表、新增、编辑、详情。
+  - `/pharma/ops/drug_masters`：药品主数据列表、新增、编辑。
+  - `/pharma/ops/supplier_offers`：报价列表、新增、编辑、详情。
+  - 报价详情页可维护可售区域和批号库存。
 
 ### 6.4 货盘 Excel 导入
 
@@ -201,7 +207,10 @@ Health: /up 返回 200
 - 导入供应商、仓库、药品、报价、可售区域、批号库存。
 - 每一行独立事务。
 - 坏行进入 `error_details`，不影响其他行。
-- 支持查看导入结果。
+- 支持运营页面上传、查看导入历史和导入结果。
+- 运营页面入口：
+  - `/pharma/ops/inventory_imports`：导入历史。
+  - `/pharma/ops/inventory_imports/new`：上传货盘 Excel。
 
 核心类：
 
@@ -360,6 +369,10 @@ Health: /up 返回 200
   - 业务看板。
   - 药店主体和资质审核。
   - 货盘库存查看。
+  - 货盘方、资质、仓库维护。
+  - 药品主数据维护。
+  - 报价、可售区域、批号库存维护。
+  - 货盘 Excel 上传、导入历史、导入详情。
   - 订单列表/详情。
   - 履约单发货、取消、签收。
 - 收货时会把锁定库存转为真实出库：减少 `quantity_locked` 和 `quantity_on_hand`。
@@ -477,6 +490,14 @@ PATCH /pharma/admin/api/v1/supplier_fulfillments/:id/transition
 2. 后台创建药品主数据。
 3. 后台创建报价、可售区域、批号库存。
 4. 或者通过 Excel 一次导入上述数据。
+
+运营端页面路径：
+
+- `/pharma/ops/catalog`：货盘库存总览。
+- `/pharma/ops/suppliers`：货盘方维护。
+- `/pharma/ops/drug_masters`：药品主数据维护。
+- `/pharma/ops/supplier_offers`：报价、区域、批号库存维护。
+- `/pharma/ops/inventory_imports`：Excel 导入历史和结果。
 
 ### 8.2 药店准入流程
 
@@ -658,7 +679,7 @@ feature/spree-pharma-foundation
 - 还没有发票、对账、结算模块。
 - 还没有随货资料、质检报告、冷链记录、追溯码。
 - Excel 导入是同步处理，不适合超大文件。
-- Excel 导入还没有模板下载和导入历史列表筛选。
+- Excel 导入还没有模板下载、错误文件导出和导入历史列表筛选。
 - 药品到 Spree Product/Variant 目前是最小绑定，后续需要做正式商品发布、图片、分类、价格体系。
 - Spree 相关 deprecation warning 后续需要处理，尤其是升级到 Spree 6 前。
 
@@ -678,7 +699,7 @@ feature/spree-pharma-foundation
 3. **货盘导入增强**
    - 模板下载。
    - 异步导入。
-   - 导入历史列表。
+   - 导入历史列表筛选。
    - 错误文件导出。
 
 ### P1：采购闭环增强

@@ -127,13 +127,82 @@
 }
 
 .pharma-form input,
-.pharma-filter-grid input {
+.pharma-form select,
+.pharma-form textarea,
+.pharma-filter-grid input,
+.pharma-filter-grid select {
   min-height: 38px;
   padding: 0 10px;
   border: 1px solid #c8d1da;
   border-radius: 6px;
+  background: #ffffff;
   color: #17202a;
   font-size: 14px;
+}
+
+.pharma-form textarea {
+  min-height: 96px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.pharma-form input[type="checkbox"] {
+  min-height: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.pharma-form input[type="file"] {
+  padding: 8px 10px;
+}
+
+.pharma-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pharma-form-full,
+.pharma-form-actions {
+  grid-column: 1 / -1;
+}
+
+.pharma-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.pharma-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -4px 0 18px;
+}
+
+.pharma-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pharma-detail-item {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid #edf0f4;
+  border-radius: 6px;
+  background: #fbfcfd;
+}
+
+.pharma-detail-item span {
+  color: #607383;
+  font-size: 12px;
+}
+
+.pharma-empty-state {
+  padding: 24px;
+  color: #607383;
+  text-align: center;
 }
 
 .pharma-primary-button,
@@ -270,7 +339,9 @@
   }
 
   .pharma-filter-grid,
-  .pharma-metrics {
+  .pharma-form-grid,
+  .pharma-metrics,
+  .pharma-detail-grid {
     grid-template-columns: 1fr;
   }
 }

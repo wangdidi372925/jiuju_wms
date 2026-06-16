@@ -1,0 +1,26 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">货盘 Excel 导入</p>
+    <h1>上传货盘 Excel</h1>
+  </div>
+</section>
+
+<section class="pharma-panel">
+  <%= form_with scope: :inventory_import, url: "/pharma/ops/inventory_imports", method: :post, multipart: true, class: "pharma-form" do |form| %>
+    <label>
+      货盘 Excel 文件
+      <%= form.file_field :file, accept: ".xlsx", required: true %>
+    </label>
+    <div class="pharma-form-actions">
+      <%= form.submit "开始导入", class: "pharma-primary-button" %>
+      <a class="pharma-secondary-button" href="/pharma/ops/inventory_imports">返回导入记录</a>
+    </div>
+  <% end %>
+</section>
+
+<section class="pharma-panel">
+  <h2>导入列说明</h2>
+  <p class="pharma-muted">
+    必填列包括供应商、仓库、药品、报价、可售区域和批号库存字段。当前版本同步处理 `.xlsx` 文件，导入失败的行会记录在导入详情中。
+  </p>
+</section>

@@ -1,0 +1,11 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">报价可售区域</p>
+    <h1>新增可售区域</h1>
+  </div>
+</section>
+
+<section class="pharma-panel">
+  <p class="pharma-kicker"><%= @offer.drug_master.common_name %> / <%= @offer.supplier.name %></p>
+  <%= render "form", offer: @offer, region: @region %>
+</section>

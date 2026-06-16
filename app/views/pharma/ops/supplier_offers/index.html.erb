@@ -1,0 +1,53 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">货盘管理</p>
+    <h1>报价</h1>
+  </div>
+  <a class="pharma-primary-button" href="/pharma/ops/supplier_offers/new">新增报价</a>
+</section>
+
+<nav class="pharma-subnav">
+  <a class="pharma-secondary-button" href="/pharma/ops/catalog">货盘总览</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/suppliers">货盘方</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/drug_masters">药品主数据</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/inventory_imports">Excel 导入</a>
+</nav>
+
+<section class="pharma-table-wrap">
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>药品</th>
+        <th>货盘方</th>
+        <th>仓库</th>
+        <th>价格</th>
+        <th>数量规则</th>
+        <th>有效期</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @offers.each do |offer| %>
+        <tr>
+          <td><strong><%= offer.drug_master.common_name %></strong><span><%= offer.drug_master.specification %> / <%= offer.drug_master.manufacturer %></span></td>
+          <td><%= offer.supplier.name %></td>
+          <td><%= offer.supplier_warehouse.name %></td>
+          <td><%= offer.unit_price %></td>
+          <td>起订 <%= offer.min_order_quantity %><span>限购 <%= offer.max_order_quantity.presence || "不限" %></span></td>
+          <td><%= l offer.starts_at, format: :short %><span>至 <%= l offer.ends_at, format: :short %></span></td>
+          <td><%= offer.status %></td>
+          <td>
+            <div class="pharma-action-row">
+              <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers/<%= offer.id %>">详情</a>
+              <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers/<%= offer.id %>/edit">编辑</a>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @offers.blank? %>
+    <div class="pharma-empty-state">暂无报价</div>
+  <% end %>
+</section>

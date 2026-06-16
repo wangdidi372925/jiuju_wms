@@ -1,0 +1,40 @@
+<%= render "pharma/ops/shared/errors", resource: supplier %>
+
+<%= form_with model: supplier, url: supplier.persisted? ? "/pharma/ops/suppliers/#{supplier.id}" : "/pharma/ops/suppliers", method: supplier.persisted? ? :patch : :post, class: "pharma-form pharma-form-grid" do |form| %>
+  <label>
+    货盘方名称
+    <%= form.text_field :name, required: true %>
+  </label>
+  <label>
+    货盘方编码
+    <%= form.text_field :code, required: true %>
+  </label>
+  <label>
+    联系人
+    <%= form.text_field :contact_name, required: true %>
+  </label>
+  <label>
+    联系电话
+    <%= form.text_field :contact_phone, required: true %>
+  </label>
+  <label>
+    省份
+    <%= form.text_field :province, required: true %>
+  </label>
+  <label>
+    城市
+    <%= form.text_field :city, required: true %>
+  </label>
+  <label>
+    状态
+    <%= form.select :status, Pharma::Supplier::STATUSES.map { |status| [status, status] } %>
+  </label>
+  <label>
+    优先级
+    <%= form.number_field :priority, required: true %>
+  </label>
+  <div class="pharma-form-actions">
+    <%= form.submit "保存货盘方", class: "pharma-primary-button" %>
+    <a class="pharma-secondary-button" href="/pharma/ops/suppliers">返回列表</a>
+  </div>
+<% end %>

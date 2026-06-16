@@ -1,0 +1,90 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">报价详情</p>
+    <h1><%= @offer.drug_master.common_name %> / <%= @offer.supplier.name %></h1>
+  </div>
+  <div class="pharma-action-row">
+    <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers/<%= @offer.id %>/edit">编辑报价</a>
+    <a class="pharma-primary-button" href="/pharma/ops/supplier_offers/<%= @offer.id %>/regions/new">新增可售区域</a>
+    <a class="pharma-primary-button" href="/pharma/ops/supplier_offers/<%= @offer.id %>/batch_stocks/new">新增批号库存</a>
+  </div>
+</section>
+
+<section class="pharma-metrics">
+  <div><span>单价</span><strong><%= @offer.unit_price %></strong></div>
+  <div><span>可用库存</span><strong><%= @offer.available_quantity %></strong></div>
+  <div><span>状态</span><strong><%= @offer.status %></strong></div>
+</section>
+
+<section class="pharma-panel">
+  <div class="pharma-detail-grid">
+    <div class="pharma-detail-item"><span>药品</span><strong><%= @offer.drug_master.display_name %></strong></div>
+    <div class="pharma-detail-item"><span>批准文号</span><strong><%= @offer.drug_master.approval_number %></strong></div>
+    <div class="pharma-detail-item"><span>货盘方</span><strong><%= @offer.supplier.name %></strong></div>
+    <div class="pharma-detail-item"><span>仓库</span><strong><%= @offer.supplier_warehouse.name %></strong></div>
+    <div class="pharma-detail-item"><span>起订量</span><strong><%= @offer.min_order_quantity %></strong></div>
+    <div class="pharma-detail-item"><span>限购量</span><strong><%= @offer.max_order_quantity.presence || "不限" %></strong></div>
+    <div class="pharma-detail-item"><span>报价开始</span><strong><%= l @offer.starts_at, format: :short %></strong></div>
+    <div class="pharma-detail-item"><span>报价结束</span><strong><%= l @offer.ends_at, format: :short %></strong></div>
+  </div>
+</section>
+
+<section class="pharma-table-wrap">
+  <h2>可售区域</h2>
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>区域</th>
+        <th>配送天数</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @offer.supplier_offer_regions.each do |region| %>
+        <tr>
+          <td><%= [region.province, region.city, region.district].compact_blank.join(" / ") %></td>
+          <td><%= region.delivery_days %> 天</td>
+          <td><%= region.status %></td>
+          <td><a class="pharma-secondary-button" href="/pharma/ops/supplier_offer_regions/<%= region.id %>/edit">编辑</a></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @offer.supplier_offer_regions.blank? %>
+    <div class="pharma-empty-state">暂无可售区域</div>
+  <% end %>
+</section>
+
+<section class="pharma-table-wrap">
+  <h2>批号库存</h2>
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>批号</th>
+        <th>效期</th>
+        <th>库存</th>
+        <th>锁定</th>
+        <th>可用</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @offer.drug_batch_stocks.each do |stock| %>
+        <tr>
+          <td><%= stock.batch_no %></td>
+          <td><%= stock.expiry_date %></td>
+          <td><%= stock.quantity_on_hand %></td>
+          <td><%= stock.quantity_locked %></td>
+          <td><%= stock.available_quantity %></td>
+          <td><%= stock.status %></td>
+          <td><a class="pharma-secondary-button" href="/pharma/ops/drug_batch_stocks/<%= stock.id %>/edit">编辑</a></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @offer.drug_batch_stocks.blank? %>
+    <div class="pharma-empty-state">暂无批号库存</div>
+  <% end %>
+</section>

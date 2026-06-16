@@ -1,0 +1,10 @@
+<% if resource.errors.any? %>
+  <div class="pharma-flash pharma-flash-alert">
+    <strong>保存失败</strong>
+    <ul>
+      <% resource.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

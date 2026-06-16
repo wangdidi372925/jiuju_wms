@@ -1,0 +1,28 @@
+<%= render "pharma/ops/shared/errors", resource: region %>
+
+<%= form_with model: region, url: region.persisted? ? "/pharma/ops/supplier_offer_regions/#{region.id}" : "/pharma/ops/supplier_offers/#{offer.id}/regions", method: region.persisted? ? :patch : :post, class: "pharma-form pharma-form-grid" do |form| %>
+  <label>
+    可售省份
+    <%= form.text_field :province, required: true %>
+  </label>
+  <label>
+    可售城市
+    <%= form.text_field :city %>
+  </label>
+  <label>
+    可售区县
+    <%= form.text_field :district %>
+  </label>
+  <label>
+    配送天数
+    <%= form.number_field :delivery_days, required: true, min: 0, step: 1 %>
+  </label>
+  <label>
+    状态
+    <%= form.select :status, Pharma::SupplierOfferRegion::STATUSES.map { |status| [status, status] } %>
+  </label>
+  <div class="pharma-form-actions">
+    <%= form.submit "保存可售区域", class: "pharma-primary-button" %>
+    <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers/<%= offer.id %>">返回报价</a>
+  </div>
+<% end %>

@@ -37,6 +37,8 @@ Rails.application.routes.draw do
       get :login, to: 'sessions#new'
       resource :session, only: %i[create destroy]
       get :catalog, to: 'catalog#index'
+      resources :drug_masters, only: %i[index new create edit update]
+      resources :inventory_imports, only: %i[index new create show]
       resources :orders, only: %i[index show], param: :number
       resources :pharmacies, only: %i[index show] do
         patch :review, on: :member
@@ -47,6 +49,18 @@ Rails.application.routes.draw do
       resources :fulfillments, only: %i[index show] do
         patch :transition, on: :member
       end
+      resources :supplier_offers, only: %i[index new create show edit update] do
+        resources :regions, only: %i[new create], controller: :supplier_offer_regions
+        resources :batch_stocks, only: %i[new create], controller: :drug_batch_stocks
+      end
+      resources :supplier_offer_regions, only: %i[edit update]
+      resources :drug_batch_stocks, only: %i[edit update]
+      resources :suppliers, only: %i[index new create show edit update] do
+        resources :licenses, only: %i[new create], controller: :supplier_licenses
+        resources :warehouses, only: %i[new create], controller: :supplier_warehouses
+      end
+      resources :supplier_licenses, only: %i[edit update]
+      resources :supplier_warehouses, only: %i[edit update]
     end
 
     namespace :admin do

@@ -1,0 +1,52 @@
+<%= render "pharma/ops/shared/errors", resource: drug %>
+
+<%= form_with model: drug, url: drug.persisted? ? "/pharma/ops/drug_masters/#{drug.id}" : "/pharma/ops/drug_masters", method: drug.persisted? ? :patch : :post, class: "pharma-form pharma-form-grid" do |form| %>
+  <label>
+    通用名
+    <%= form.text_field :common_name, required: true %>
+  </label>
+  <label>
+    商品名
+    <%= form.text_field :trade_name %>
+  </label>
+  <label>
+    规格
+    <%= form.text_field :specification, required: true %>
+  </label>
+  <label>
+    剂型
+    <%= form.text_field :dosage_form, required: true %>
+  </label>
+  <label>
+    生产厂家
+    <%= form.text_field :manufacturer, required: true %>
+  </label>
+  <label>
+    批准文号
+    <%= form.text_field :approval_number, required: true %>
+  </label>
+  <label>
+    包装单位
+    <%= form.text_field :package_unit, required: true %>
+  </label>
+  <label>
+    是否处方药
+    <%= form.select :prescription_required, [["否", false], ["是", true]] %>
+  </label>
+  <label>
+    储存条件
+    <%= form.text_field :storage_condition, required: true %>
+  </label>
+  <label>
+    温控
+    <%= form.select :temperature_control, Pharma::DrugMaster::TEMPERATURE_CONTROLS.map { |control| [control, control] } %>
+  </label>
+  <label>
+    状态
+    <%= form.select :status, Pharma::DrugMaster::STATUSES.map { |status| [status, status] } %>
+  </label>
+  <div class="pharma-form-actions">
+    <%= form.submit "保存药品", class: "pharma-primary-button" %>
+    <a class="pharma-secondary-button" href="/pharma/ops/drug_masters">返回列表</a>
+  </div>
+<% end %>

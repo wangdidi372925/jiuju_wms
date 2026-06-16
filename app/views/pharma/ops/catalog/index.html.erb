@@ -3,7 +3,19 @@
     <p class="pharma-kicker">平台运营</p>
     <h1>货盘库存</h1>
   </div>
+  <div class="pharma-action-row">
+    <a class="pharma-secondary-button" href="/pharma/ops/suppliers">货盘方</a>
+    <a class="pharma-secondary-button" href="/pharma/ops/drug_masters">药品主数据</a>
+    <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers">报价</a>
+    <a class="pharma-primary-button" href="/pharma/ops/inventory_imports/new">上传货盘 Excel</a>
+  </div>
 </section>
+
+<nav class="pharma-subnav">
+  <a class="pharma-secondary-button" href="/pharma/ops/inventory_imports">导入记录</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers/new">新增报价</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/drug_masters/new">新增药品</a>
+</nav>
 
 <section class="pharma-table-wrap">
   <table class="pharma-table">
@@ -41,4 +53,7 @@
       <% end %>
     </tbody>
   </table>
+  <% if @offers.blank? %>
+    <div class="pharma-empty-state">暂无可售货盘</div>
+  <% end %>
 </section>

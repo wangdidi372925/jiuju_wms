@@ -1,0 +1,46 @@
+<section class="pharma-heading-row">
+  <div>
+    <p class="pharma-kicker">货盘管理</p>
+    <h1>Excel 导入记录</h1>
+  </div>
+  <a class="pharma-primary-button" href="/pharma/ops/inventory_imports/new">上传货盘 Excel</a>
+</section>
+
+<nav class="pharma-subnav">
+  <a class="pharma-secondary-button" href="/pharma/ops/catalog">货盘总览</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/suppliers">货盘方</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/drug_masters">药品主数据</a>
+  <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers">报价</a>
+</nav>
+
+<section class="pharma-table-wrap">
+  <table class="pharma-table">
+    <thead>
+      <tr>
+        <th>文件</th>
+        <th>状态</th>
+        <th>总行数</th>
+        <th>成功</th>
+        <th>失败</th>
+        <th>导入时间</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @imports.each do |import| %>
+        <tr>
+          <td><strong><%= import.original_filename %></strong></td>
+          <td><%= import.status %></td>
+          <td><%= import.total_rows %></td>
+          <td><%= import.success_rows %></td>
+          <td><%= import.failed_rows %></td>
+          <td><%= l import.created_at, format: :short %></td>
+          <td><a class="pharma-secondary-button" href="/pharma/ops/inventory_imports/<%= import.id %>">详情</a></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @imports.blank? %>
+    <div class="pharma-empty-state">暂无导入记录</div>
+  <% end %>
+</section>

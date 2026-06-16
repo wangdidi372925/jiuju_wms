@@ -1,0 +1,44 @@
+<%= render "pharma/ops/shared/errors", resource: offer %>
+
+<%= form_with model: offer, url: offer.persisted? ? "/pharma/ops/supplier_offers/#{offer.id}" : "/pharma/ops/supplier_offers", method: offer.persisted? ? :patch : :post, class: "pharma-form pharma-form-grid" do |form| %>
+  <label>
+    货盘方
+    <%= form.collection_select :supplier_id, suppliers, :id, :name, { prompt: "请选择货盘方" }, { required: true } %>
+  </label>
+  <label>
+    仓库
+    <%= form.select :supplier_warehouse_id, warehouses.map { |warehouse| ["#{warehouse.name} / #{warehouse.supplier.name}", warehouse.id] }, { prompt: "请选择仓库" }, required: true %>
+  </label>
+  <label class="pharma-form-full">
+    药品
+    <%= form.select :drug_master_id, drugs.map { |drug| ["#{drug.common_name} #{drug.specification} / #{drug.manufacturer} / #{drug.approval_number}", drug.id] }, { prompt: "请选择药品" }, required: true %>
+  </label>
+  <label>
+    单价
+    <%= form.number_field :unit_price, required: true, min: "0.01", step: "0.01" %>
+  </label>
+  <label>
+    起订量
+    <%= form.number_field :min_order_quantity, required: true, min: 1, step: 1 %>
+  </label>
+  <label>
+    限购量
+    <%= form.number_field :max_order_quantity, min: 1, step: 1 %>
+  </label>
+  <label>
+    状态
+    <%= form.select :status, Pharma::SupplierOffer::STATUSES.map { |status| [status, status] } %>
+  </label>
+  <label>
+    报价开始
+    <%= form.datetime_field :starts_at, required: true %>
+  </label>
+  <label>
+    报价结束
+    <%= form.datetime_field :ends_at, required: true %>
+  </label>
+  <div class="pharma-form-actions">
+    <%= form.submit "保存报价", class: "pharma-primary-button" %>
+    <a class="pharma-secondary-button" href="/pharma/ops/supplier_offers">返回列表</a>
+  </div>
+<% end %>

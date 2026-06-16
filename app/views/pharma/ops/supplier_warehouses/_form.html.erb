@@ -1,0 +1,40 @@
+<%= render "pharma/ops/shared/errors", resource: warehouse %>
+
+<%= form_with model: warehouse, url: warehouse.persisted? ? "/pharma/ops/supplier_warehouses/#{warehouse.id}" : "/pharma/ops/suppliers/#{supplier.id}/warehouses", method: warehouse.persisted? ? :patch : :post, class: "pharma-form pharma-form-grid" do |form| %>
+  <label>
+    仓库名称
+    <%= form.text_field :name, required: true %>
+  </label>
+  <label>
+    仓库编码
+    <%= form.text_field :code, required: true %>
+  </label>
+  <label>
+    省份
+    <%= form.text_field :province, required: true %>
+  </label>
+  <label>
+    城市
+    <%= form.text_field :city, required: true %>
+  </label>
+  <label>
+    区县
+    <%= form.text_field :district %>
+  </label>
+  <label>
+    状态
+    <%= form.select :status, Pharma::SupplierWarehouse::STATUSES.map { |status| [status, status] } %>
+  </label>
+  <label>
+    是否冷链仓
+    <%= form.select :cold_chain_enabled, [["否", false], ["是", true]] %>
+  </label>
+  <label class="pharma-form-full">
+    详细地址
+    <%= form.text_field :address, required: true %>
+  </label>
+  <div class="pharma-form-actions">
+    <%= form.submit "保存仓库", class: "pharma-primary-button" %>
+    <a class="pharma-secondary-button" href="/pharma/ops/suppliers/<%= supplier.id %>">返回货盘方</a>
+  </div>
+<% end %>
